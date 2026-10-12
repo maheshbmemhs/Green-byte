@@ -24,26 +24,28 @@ class GreenLabTests(unittest.TestCase):
             "GREENLAB_MODEL": model, "GREENLAB_PHASE": phase,
             "GREENLAB_SESSION_DIR": str(directory), "GREENLAB_SERVER_PID": str(os.getpid()),
             "GREENLAB_SMOKE": "1" if smoke else "0",
+            "GREENLAB_IMAGE": str(Path(directory) / "input.png"), "GREENLAB_CTX_SIZE": "8192",
         }
         with patch.dict(os.environ, env):
             return Config()
 
     def test_matrix_and_shuffle(self):
         for model in Config.MODELS:
-            for phase, count, delay in (("warmup", 30, 0), ("main", 90, 5000)):
+            for phase, count, delay in (("warmup", 60, 0), ("main", 180, 5000)):
                 config = self.config("/tmp", phase, model)
                 with patch("random.shuffle") as shuffle:
                     rows = config.create_run_table_model().generate_experiment_run_table()
                     self.assertEqual(shuffle.call_count, int(phase == "main"))
                     if phase == "main":
-                        self.assertEqual(len(shuffle.call_args.args[0]), 90)
+                        self.assertEqual(len(shuffle.call_args.args[0]), 180)
                 self.assertEqual(len(rows), count)
                 self.assertEqual({row["model"] for row in rows}, {model})
                 self.assertEqual({row["max_tokens"] for row in rows}, {1000, 500, 100})
+                self.assertEqual({row["prompt_type"] for row in rows}, {"text", "image"})
                 self.assertEqual(config.time_between_runs_in_ms, delay)
 
     def test_smoke_counts(self):
-        for phase, count in (("warmup", 3), ("main", 6)):
+        for phase, count in (("warmup", 6), ("main", 12)):
             config = self.config("/tmp", phase, smoke=True)
             self.assertEqual(len(config.create_run_table_model().generate_experiment_run_table()), count)
 
@@ -76,11 +78,13 @@ class GreenLabTests(unittest.TestCase):
         real_run = subprocess.run
         try:
             with tempfile.TemporaryDirectory() as tmp:
+                from PIL import Image
+                Image.new("RGB", (8, 8), "green").save(Path(tmp) / "input.png")
                 for phase in ("warmup", "main"):
                     config = self.config(tmp, phase)
                     config.URL = f"http://127.0.0.1:{server.server_port}"
                     directory = Path(tmp) / phase
-                    context = SimpleNamespace(run_dir=directory, execute_run={"model": "gemma4b", "max_tokens": 100})
+                    context = SimpleNamespace(run_dir=directory, execute_run={"model": "gemma4b", "prompt_type": "image", "max_tokens": 100})
 
                     def execute(command, **kwargs):
                         if phase == "main":
@@ -101,6 +105,11 @@ class GreenLabTests(unittest.TestCase):
                     self.assertEqual((directory / "metrics.json").exists(), phase == "main")
                 self.assertEqual(len(received), 2)
                 self.assertTrue(all(item["max_tokens"] == 100 for item in received))
+                self.assertTrue(all(item["cache_prompt"] is False for item in received))
+                self.assertEqual(received[0]["messages"][0]["content"][0]["text"], "Describe this image.")
+                import base64
+                encoded = received[0]["messages"][0]["content"][1]["image_url"]["url"]
+                self.assertEqual(base64.b64decode(encoded.split(",", 1)[1]), (Path(tmp) / "input.png").read_bytes())
                 # Exercise the actual CLI and forked Runner lifecycle, not just hooks.
                 env = os.environ.copy()
                 env.update({
@@ -108,6 +117,7 @@ class GreenLabTests(unittest.TestCase):
                     "GREENLAB_SESSION_DIR": str(Path(tmp) / "integration"),
                     "GREENLAB_SERVER_PID": str(os.getpid()), "GREENLAB_SMOKE": "1",
                     "GREENLAB_URL": f"http://127.0.0.1:{server.server_port}",
+                    "GREENLAB_IMAGE": str(Path(tmp) / "input.png"), "GREENLAB_CTX_SIZE": "8192",
                 })
                 result = real_run(
                     [sys.executable, str(launcher.ROOT / "experiment-runner"), str(EXAMPLE / "RunnerConfig.py")],
@@ -115,7 +125,9 @@ class GreenLabTests(unittest.TestCase):
                 )
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 launcher.verify_completion(Path(tmp) / "integration/gemma4b/warmup", "gemma4b", 1)
-                self.assertEqual([item["max_tokens"] for item in received[2:]], [1000, 500, 100])
+                self.assertEqual([item["max_tokens"] for item in received[2:]], [1000, 500, 100] * 2)
+                self.assertEqual(received[2]["messages"][0]["content"], "Describe photosynthesis.")
+                self.assertFalse(list((Path(tmp) / "integration").rglob("energibridge.csv")))
         finally:
             server.shutdown()
             thread.join()
@@ -124,9 +136,9 @@ class GreenLabTests(unittest.TestCase):
     def test_invalid_response_fails_warmup(self):
         with tempfile.TemporaryDirectory() as tmp:
             config = self.config(tmp, "warmup")
-            context = SimpleNamespace(run_dir=Path(tmp), execute_run={"max_tokens": 100})
+            context = SimpleNamespace(run_dir=Path(tmp), execute_run={"prompt_type": "text", "max_tokens": 100})
             with patch("subprocess.run", side_effect=lambda *a, **k: (Path(tmp) / "response.json").write_text('{"error":"bad"}')):
-                with self.assertRaises(KeyError):
+                with self.assertRaises(ValueError):
                     config.interact(context)
 
     def test_completion_requires_every_row(self):
@@ -162,8 +174,9 @@ class GreenLabTests(unittest.TestCase):
                     if failure:
                         raise failure
 
-                args = SimpleNamespace(port=8080, llama=Path("llama"))
+                args = SimpleNamespace(port=8080, llama=Path("llama"), ctx_size=8192)
                 with patch.object(launcher, "check_port"), patch.object(launcher, "wait_ready"), \
+                     patch.object(launcher, "validate_vision", return_value={}), \
                      patch.object(launcher.subprocess, "Popen", return_value=server) as start, \
                      patch.object(launcher, "run_phase", side_effect=phase), \
                      patch.object(launcher.time, "sleep", side_effect=lambda n: events.append(n)), \
@@ -175,7 +188,85 @@ class GreenLabTests(unittest.TestCase):
                         launcher.run_model("gemma4b", Path(tmp), args)
                         self.assertEqual(events, ["warmup", 1, 1, 1, 1, 1, "main"])
                     start.assert_called_once()
+                    command = start.call_args.args[0]
+                    self.assertEqual(command[command.index("-c") + 1], "8192")
+                    self.assertIn("--no-context-shift", command)
                     stop.assert_called_once_with(server)
+
+    def test_image_validation(self):
+        from PIL import Image
+        with tempfile.TemporaryDirectory() as tmp:
+            for format, suffix in (("PNG", "png"), ("JPEG", "jpg")):
+                path = Path(tmp) / f"input.{suffix}"
+                Image.new("RGB", (12, 8), "green").save(path, format=format)
+                data, metadata = launcher.read_image(path)
+                self.assertEqual(data, path.read_bytes())
+                self.assertEqual((metadata["width"], metadata["height"]), (12, 8))
+                self.assertEqual(metadata["format"], format)
+            with self.assertRaises(FileNotFoundError):
+                launcher.read_image(Path(tmp) / "missing.png")
+            invalid = Path(tmp) / "bad.png"
+            invalid.write_bytes(b"not an image")
+            with self.assertRaises(OSError):
+                launcher.read_image(invalid)
+            Image.new("RGB", (8, 8)).save(invalid, format="GIF")
+            with self.assertRaises(ValueError):
+                launcher.read_image(invalid)
+
+    def test_context_overflow_rejected(self):
+        for phase in ("warmup", "main"):
+            for extra, prompt_tokens in (({}, 8150), ({"__verbose": {"truncated": True}}, 10)):
+                with tempfile.TemporaryDirectory() as tmp:
+                    config = self.config(tmp, phase)
+                    context = SimpleNamespace(run_dir=Path(tmp), execute_run={"prompt_type": "text", "max_tokens": 100})
+                    response = {"choices": [{"message": {"content": "text"}}],
+                                "usage": {"prompt_tokens": prompt_tokens, "completion_tokens": 2}, **extra}
+                    with patch("subprocess.run", side_effect=lambda *a, **k: (Path(tmp) / "response.json").write_text(json.dumps(response))):
+                        with self.assertRaisesRegex(ValueError, "Insufficient context"):
+                            config.interact(context)
+                    self.assertFalse((Path(tmp) / "metrics.json").exists())
+
+    def test_vision_and_context_validation(self):
+        import io
+        for props, succeeds in (
+            ({"modalities": {"vision": True}, "default_generation_settings": {"n_ctx": 8192}}, True),
+            ({"modalities": {"vision": False}}, False),
+            ({}, False),
+            ({"modalities": {"vision": True}, "default_generation_settings": {"n_ctx": 2048}}, False),
+        ):
+            with patch("urllib.request.urlopen", return_value=io.BytesIO(json.dumps(props).encode())):
+                if succeeds:
+                    self.assertEqual(launcher.validate_vision("http://localhost", 8192), props)
+                else:
+                    with self.assertRaises(RuntimeError):
+                        launcher.validate_vision("http://localhost", 8192)
+
+    def test_session_image_snapshot(self):
+        from PIL import Image
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "diagram.png"
+            Image.new("RGB", (12, 8), "green").save(source)
+            original = source.read_bytes()
+            sessions = Path(tmp) / "sessions"
+
+            def model_run(model, session, args):
+                self.assertEqual(args.image.read_bytes(), original)
+                # Subsequent runs must use the session copy, not the original file.
+                source.write_bytes(b"changed")
+
+            argv = ["launcher", "--image", str(source), "--results-dir", str(sessions),
+                    "--llama", sys.executable, "--energibridge", sys.executable, "--smoke"]
+            with patch.object(sys, "argv", argv), patch.object(launcher, "check_port"), \
+                 patch.object(launcher, "run_model", side_effect=model_run) as run:
+                launcher.main()
+            self.assertEqual(run.call_count, 3)
+            session = next(sessions.iterdir())
+            metadata = json.loads((session / "session.json").read_text())
+            self.assertEqual(metadata["status"], "complete")
+            self.assertEqual(metadata["prompts"], Config.PROMPTS)
+            self.assertFalse(metadata["cache_prompt"])
+            import hashlib
+            self.assertEqual(metadata["image"]["sha256"], hashlib.sha256(original).hexdigest())
 
     def test_occupied_port_and_dead_server(self):
         import socket

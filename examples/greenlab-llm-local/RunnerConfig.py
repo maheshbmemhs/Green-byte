@@ -1,5 +1,6 @@
 
 import json
+import base64
 import os
 import subprocess
 import time
@@ -21,6 +22,7 @@ class RunnerConfig:
     operation_type = OperationType.AUTO
     self_measure = False
     TOKEN_LIMITS = [1000, 500, 100]
+    PROMPT_TYPES = ["text", "image"]
 
     LLAMA = Path(
         "/media/mahesh/New Volume/courses/"
@@ -47,12 +49,7 @@ class RunnerConfig:
 
     URL = "http://127.0.0.1:8080"
 
-    PROMPT = (
-        "Explain photosynthesis, including the roles of sunlight, "
-        "water, carbon dioxide, chlorophyll, and glucose. "
-        "Write in clear, "
-        "continuous prose."
-    )
+    PROMPTS = {"text": "Describe photosynthesis.", "image": "Describe this image."}
 
 
     def __init__(self):
@@ -61,6 +58,8 @@ class RunnerConfig:
             self.phase = os.environ["GREENLAB_PHASE"]
             self.results_output_path = Path(os.environ["GREENLAB_SESSION_DIR"])
             self.server_pid = int(os.environ["GREENLAB_SERVER_PID"])
+            self.image_path = Path(os.environ["GREENLAB_IMAGE"])
+            self.context_size = int(os.environ["GREENLAB_CTX_SIZE"])
         except KeyError as exc:
             raise RuntimeError("Use run_experiments.py to start this configuration") from exc
         if self.model not in self.MODELS or self.phase not in ("warmup", "main"):
@@ -150,14 +149,16 @@ class RunnerConfig:
         }
 
 
-    def create_run_table_model(self):
-        self.run_table_model = RunTableModel(
+    @classmethod
+    def build_run_table_model(cls, model, repetitions, measured=False):
+        return RunTableModel(
             factors=[
-                FactorModel("model", [self.model]),
-                FactorModel("max_tokens", self.TOKEN_LIMITS)
+                FactorModel("model", [model]),
+                FactorModel("prompt_type", cls.PROMPT_TYPES),
+                FactorModel("max_tokens", cls.TOKEN_LIMITS)
             ],
-            repetitions=self.repetitions,
-            data_columns=[] if self.phase == "warmup" else [
+            repetitions=repetitions,
+            data_columns=[] if not measured else [
                 "duration_s",
                 "prompt_tokens",
                 "completion_tokens",
@@ -167,7 +168,12 @@ class RunnerConfig:
                 "mean_memory_usage",
                 "mean_energy_usage"
             ],
-            shuffle=self.phase == "main"
+            shuffle=measured
+        )
+
+    def create_run_table_model(self):
+        self.run_table_model = self.build_run_table_model(
+            self.model, self.repetitions, self.phase == "main"
         )
         return self.run_table_model
 
@@ -200,14 +206,24 @@ class RunnerConfig:
         if not self.server_ready():
             raise RuntimeError("Launcher-owned model server is not healthy")
 
-    def send_request(self, prompt, tokens, output_path):
+    def send_request(self, prompt_type, tokens, output_path):
+        content = self.PROMPTS[prompt_type]
+        if prompt_type == "image":
+            mime = "image/png" if self.image_path.suffix.lower() == ".png" else "image/jpeg"
+            encoded = base64.b64encode(self.image_path.read_bytes()).decode("ascii")
+            content = [
+                {"type": "text", "text": content},
+                {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{encoded}"}},
+            ]
         payload = {
             "messages": [
-                {"role": "user", "content": prompt}
+                {"role": "user", "content": content}
             ],
             "max_tokens": int(tokens),
             "temperature": 0,
             "stream": False,
+            "cache_prompt": False,
+            "verbose": True,
         }
 
         payload_path = output_path.with_suffix(".request.json")
@@ -222,6 +238,7 @@ class RunnerConfig:
 
     def interact(self, context):
         tokens = int(context.execute_run["max_tokens"])
+        prompt_type = context.execute_run["prompt_type"]
         run_dir = context.run_dir
         run_dir.mkdir(parents=True, exist_ok=True)
 
@@ -229,9 +246,14 @@ class RunnerConfig:
         energy_path = run_dir / "energibridge.csv"
 
         payload_path = self.send_request(
-            self.PROMPT, tokens,
+            prompt_type, tokens,
             response_path
         )
+        (run_dir / "run_metadata.json").write_text(json.dumps({
+            "model": self.model, "phase": self.phase,
+            "prompt_type": prompt_type, "max_tokens": tokens,
+            "context_size": self.context_size, "cache_prompt": False,
+        }, indent=2))
 
         curl_command = [
             "curl",
@@ -265,6 +287,12 @@ class RunnerConfig:
 
         response = json.loads(response_path.read_text())
         usage = response.get("usage", {})
+        prompt_tokens = usage.get("prompt_tokens")
+        if not isinstance(prompt_tokens, int) or prompt_tokens < 0:
+            raise ValueError("Response is missing a valid prompt_tokens count")
+        if (response.get("truncated") or response.get("__verbose", {}).get("truncated")
+                or prompt_tokens + tokens + 1 >= self.context_size):
+            raise ValueError("Insufficient context for input plus output limit; increase --ctx-size for a new session")
 
         output_text = response["choices"][0]["message"]["content"]
         generated = int(usage.get("completion_tokens", 0))
@@ -290,7 +318,8 @@ class RunnerConfig:
         self.metrics.update(resource_metrics)
 
         (run_dir / "metrics.json").write_text(
-            json.dumps(self.metrics, indent=2)
+            json.dumps({**self.metrics, "model": self.model, "prompt_type": prompt_type,
+                        "max_tokens": tokens}, indent=2)
         )
 
     def stop_measurement(self, context):
