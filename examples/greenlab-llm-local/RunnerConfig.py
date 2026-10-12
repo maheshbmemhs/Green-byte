@@ -1,5 +1,6 @@
 
 import json
+import os
 import subprocess
 import time
 import urllib.request
@@ -17,19 +18,14 @@ import statistics
 
 
 class RunnerConfig:
-    name = "greenlab_gpu_smoke_v1"
-    results_output_path =Path.home() / "GreenLab" / "results" #"/home/mahesh/Desktop/courses/Green_lab/lab_repo/experiment-runner/examples/greenlab-llm/results" #Path.home() / "GreenLab" / "results"
     operation_type = OperationType.AUTO
-    time_between_runs_in_ms = 5000
+    self_measure = False
+    TOKEN_LIMITS = [1000, 500, 100]
 
     LLAMA = Path(
         "/media/mahesh/New Volume/courses/"
         "GreenLab/repo/llama.cpp/build-cuda/bin/llama-server"
     )
-
-    # ENERGIBRIDGE = Path.home() / (
-    #     "EnergiBridge/target/release/energibridge"
-    # )
 
     ENERGIBRIDGE = shutil.which("energibridge")
 
@@ -54,15 +50,27 @@ class RunnerConfig:
     PROMPT = (
         "Explain photosynthesis, including the roles of sunlight, "
         "water, carbon dioxide, chlorophyll, and glucose. "
-        "Write approximately {word_count} words in clear, "
+        "Write in clear, "
         "continuous prose."
     )
-    
+
 
     def __init__(self):
-        self.server = None
-        self.server_log = None
-        self.current_model = None
+        try:
+            self.model = os.environ["GREENLAB_MODEL"]
+            self.phase = os.environ["GREENLAB_PHASE"]
+            self.results_output_path = Path(os.environ["GREENLAB_SESSION_DIR"])
+            self.server_pid = int(os.environ["GREENLAB_SERVER_PID"])
+        except KeyError as exc:
+            raise RuntimeError("Use run_experiments.py to start this configuration") from exc
+        if self.model not in self.MODELS or self.phase not in ("warmup", "main"):
+            raise ValueError("Invalid GreenLab model or phase")
+        self.name = f"{self.model}/{self.phase}"
+        self.URL = os.environ.get("GREENLAB_URL", self.URL)
+        self.ENERGIBRIDGE = os.environ.get("GREENLAB_ENERGIBRIDGE", self.ENERGIBRIDGE)
+        smoke = os.environ.get("GREENLAB_SMOKE") == "1"
+        self.repetitions = (1 if smoke else 10) if self.phase == "warmup" else (2 if smoke else 30)
+        self.time_between_runs_in_ms = 0 if self.phase == "warmup" else 5000
         self.metrics = {}
 
         EventSubscriptionController.subscribe_to_multiple_events([
@@ -145,21 +153,21 @@ class RunnerConfig:
     def create_run_table_model(self):
         self.run_table_model = RunTableModel(
             factors=[
-                FactorModel("model", list(self.MODELS.keys())),
-                FactorModel("max_tokens", [1000])
+                FactorModel("model", [self.model]),
+                FactorModel("max_tokens", self.TOKEN_LIMITS)
             ],
-            repetitions=2,
-            data_columns=[
+            repetitions=self.repetitions,
+            data_columns=[] if self.phase == "warmup" else [
                 "duration_s",
                 "prompt_tokens",
                 "completion_tokens",
                 "output_bytes",
                 "tokens_per_second",
-                    "mean_cpu_usage",
-                    "mean_memory_usage",
-                    "mean_energy_usage"
+                "mean_cpu_usage",
+                "mean_memory_usage",
+                "mean_energy_usage"
             ],
-            shuffle=False
+            shuffle=self.phase == "main"
         )
         return self.run_table_model
 
@@ -168,11 +176,7 @@ class RunnerConfig:
             parents=True, exist_ok=True
         )
 
-        if not self.LLAMA.is_file():
-            raise FileNotFoundError(self.LLAMA)
-
-        if not self.ENERGIBRIDGE:
-            # raise FileNotFoundError(self.ENERGIBRIDGE)
+        if self.phase == "main" and not self.ENERGIBRIDGE:
             raise FileNotFoundError("EnergiBridge executable not found in PATH")
 
     def before_run(self):
@@ -188,79 +192,13 @@ class RunnerConfig:
         except Exception:
             return False
 
-    def stop_server(self):
-        if self.server is not None:
-            self.server.terminate()
-            try:
-                self.server.wait(timeout=15)
-            except subprocess.TimeoutExpired:
-                self.server.kill()
-                self.server.wait()
-            self.server = None
-
-        if self.server_log is not None:
-            self.server_log.close()
-            self.server_log = None
-
-        self.current_model = None
-
     def start_run(self, context):
-        model = context.execute_run["model"]
-
-        # Reuse the loaded server for consecutive runs
-        # of the same model.
-        if self.current_model == model and self.server_ready():
-            return
-
-        self.stop_server()
-
-        log_path = (
-            self.results_output_path
-            / self.name
-            / f"server_{model}.log"
-        )
-        log_path.parent.mkdir(parents=True, exist_ok=True)
-
-        self.server_log = open(log_path, "a")
-
-        command = [
-            str(self.LLAMA),
-            "-hf", self.MODELS[model],
-            "--host", "127.0.0.1",
-            "--port", "8080",
-            "-c", "2048",
-            "-t", "8",
-            "-np", "1",
-            "-ngl", str(self.GPU_LAYERS[model]),
-        ]
-
-        self.server = subprocess.Popen(
-            command,
-            stdout=self.server_log,
-            stderr=subprocess.STDOUT,
-        )
-        self.current_model = model
-
-        deadline = time.monotonic() + 300
-
-        while time.monotonic() < deadline:
-            if self.server.poll() is not None:
-                raise RuntimeError(
-                    f"llama-server exited: {log_path}"
-                )
-            if self.server_ready():
-                break
-            time.sleep(2)
-        else:
-            raise TimeoutError(
-                f"Model did not become ready: {log_path}"
-            )
-
-        # Warm-up excluded from measured run.
-        self.send_request(
-            self.PROMPT, 16,
-            context.run_dir / "warmup.json"
-        )
+        self.metrics = {}
+        if context.execute_run["model"] != self.model:
+            raise RuntimeError("Run model does not match launcher model")
+        os.kill(self.server_pid, 0)
+        if not self.server_ready():
+            raise RuntimeError("Launcher-owned model server is not healthy")
 
     def send_request(self, prompt, tokens, output_path):
         payload = {
@@ -295,25 +233,6 @@ class RunnerConfig:
             response_path
         )
 
-        # command = [
-        #     str(self.ENERGIBRIDGE),
-        #     "--gpu",
-        #     "--summary",
-        #     "-o", str(energy_path),
-        #     "--",
-        #     "curl",
-        #     "--fail-with-body",
-        #     "--silent",
-        #     "--show-error",
-        #     "--max-time", "180",
-        #     "-o", str(response_path),
-        #     "-H", "Content-Type: application/json",
-        #     "--data-binary", "@" + str(payload_path),
-        #     self.URL + "/v1/chat/completions",
-        # ]
-
-        # HTTP inference request
-
         curl_command = [
             "curl",
             "--fail-with-body",
@@ -326,25 +245,13 @@ class RunnerConfig:
             self.URL + "/v1/chat/completions",
         ]
 
-        # EnergiBridge wraps the HTTP request.
-        energy_command = [
-            str(self.ENERGIBRIDGE),
-            "--gpu",
-            "--summary",
-            "-o", str(energy_path),
-            "--",
-            *curl_command,
-        ]
-
-        # Run EnergiBridge using the msr group.
-        command = [
-            "sudo",
-            "-n",
-            "sg",
-            "msr",
-            "-c",
-            shlex.join(energy_command),
-        ]
+        command = curl_command
+        if self.phase == "main":
+            energy_command = [
+                str(self.ENERGIBRIDGE), "--gpu", "--summary",
+                "-o", str(energy_path), "--", *curl_command,
+            ]
+            command = ["sudo", "-n", "sg", "msr", "-c", shlex.join(energy_command)]
 
         start = time.perf_counter()
 
@@ -356,15 +263,16 @@ class RunnerConfig:
 
         elapsed = time.perf_counter() - start
 
-        # start = time.perf_counter()
-        # subprocess.run(command, check=True, timeout=210)
-        # elapsed = time.perf_counter() - start
-
         response = json.loads(response_path.read_text())
         usage = response.get("usage", {})
 
         output_text = response["choices"][0]["message"]["content"]
         generated = int(usage.get("completion_tokens", 0))
+        if not isinstance(output_text, str) or not output_text or generated <= 0:
+            raise ValueError("Inference returned no generated text/tokens")
+        if self.phase == "warmup":
+            return
+
 
         self.metrics = {
             "duration_s": round(elapsed, 4),
@@ -377,7 +285,7 @@ class RunnerConfig:
             ),
         }
 
-        resource_metrics = self.calculate_resource_metrics( energy_path)
+        resource_metrics = self.calculate_resource_metrics(energy_path)
 
         self.metrics.update(resource_metrics)
 
@@ -395,6 +303,6 @@ class RunnerConfig:
         return self.metrics
 
     def after_experiment(self):
-        self.stop_server()
+        pass
 
     experiment_path = None
