@@ -31,7 +31,7 @@ class GreenLabTests(unittest.TestCase):
 
     def test_matrix_and_shuffle(self):
         for model in Config.MODELS:
-            for phase, count, delay in (("warmup", 60, 0), ("main", 180, 5000)):
+            for phase, count, delay in (("warmup", 60, 0), ("main", 180, 10000)):
                 config = self.config("/tmp", phase, model)
                 with patch("random.shuffle") as shuffle:
                     rows = config.create_run_table_model().generate_experiment_run_table()
@@ -40,7 +40,7 @@ class GreenLabTests(unittest.TestCase):
                         self.assertEqual(len(shuffle.call_args.args[0]), 180)
                 self.assertEqual(len(rows), count)
                 self.assertEqual({row["model"] for row in rows}, {model})
-                self.assertEqual({row["max_tokens"] for row in rows}, {1000, 500, 100})
+                self.assertEqual({row["max_tokens"] for row in rows}, {1250, 650, 120})
                 self.assertEqual({row["prompt_type"] for row in rows}, {"text", "image"})
                 self.assertEqual(config.time_between_runs_in_ms, delay)
 
@@ -48,6 +48,29 @@ class GreenLabTests(unittest.TestCase):
         for phase, count in (("warmup", 6), ("main", 12)):
             config = self.config("/tmp", phase, smoke=True)
             self.assertEqual(len(config.create_run_table_model().generate_experiment_run_table()), count)
+
+    def test_structured_prompts_for_all_combinations(self):
+        from PIL import Image
+        with tempfile.TemporaryDirectory() as tmp:
+            Image.new("RGB", (8, 8), "green").save(Path(tmp) / "input.png")
+            for prompt_type in ("text", "image"):
+                for tokens, words in ((1250, 1000), (650, 500), (120, 100)):
+                    payloads = []
+                    for phase in ("warmup", "main"):
+                        config = self.config(tmp, phase)
+                        path = config.send_request(prompt_type, tokens, Path(tmp) / "response.json")
+                        payload = json.loads(path.read_text())
+                        payloads.append(payload)
+                        content = payload["messages"][0]["content"]
+                        prompt = content if prompt_type == "text" else content[0]["text"]
+                        self.assertIn("1. Title: A concise title.", prompt)
+                        self.assertIn(f"2. Main text: Approximately {words} words", prompt)
+                        self.assertIn("Count only the main text toward the word target.", prompt)
+                        self.assertIn("shown in this image" if prompt_type == "image" else "Describe photosynthesis using", prompt)
+                        self.assertNotIn("{word_count}", prompt)
+                        self.assertEqual(payload["max_tokens"], tokens)
+                        self.assertFalse(payload["cache_prompt"])
+                    self.assertEqual(payloads[0], payloads[1])
 
     def test_real_http_warmup_and_mocked_profiler(self):
         from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -84,7 +107,7 @@ class GreenLabTests(unittest.TestCase):
                     config = self.config(tmp, phase)
                     config.URL = f"http://127.0.0.1:{server.server_port}"
                     directory = Path(tmp) / phase
-                    context = SimpleNamespace(run_dir=directory, execute_run={"model": "gemma4b", "prompt_type": "image", "max_tokens": 100})
+                    context = SimpleNamespace(run_dir=directory, execute_run={"model": "gemma4b", "prompt_type": "image", "max_tokens": 120})
 
                     def execute(command, **kwargs):
                         if phase == "main":
@@ -101,12 +124,14 @@ class GreenLabTests(unittest.TestCase):
                     with patch("subprocess.run", side_effect=execute):
                         config.interact(context)
                     self.assertTrue((directory / "response.json").exists())
+                    metadata = json.loads((directory / "run_metadata.json").read_text())
+                    self.assertEqual(metadata["target_words"], 100)
                     self.assertEqual((directory / "energibridge.csv").exists(), phase == "main")
                     self.assertEqual((directory / "metrics.json").exists(), phase == "main")
                 self.assertEqual(len(received), 2)
-                self.assertTrue(all(item["max_tokens"] == 100 for item in received))
+                self.assertTrue(all(item["max_tokens"] == 120 for item in received))
                 self.assertTrue(all(item["cache_prompt"] is False for item in received))
-                self.assertEqual(received[0]["messages"][0]["content"][0]["text"], "Describe this image.")
+                self.assertEqual(received[0]["messages"][0]["content"][0]["text"], Config.PROMPTS["image"].format(word_count=100))
                 import base64
                 encoded = received[0]["messages"][0]["content"][1]["image_url"]["url"]
                 self.assertEqual(base64.b64decode(encoded.split(",", 1)[1]), (Path(tmp) / "input.png").read_bytes())
@@ -125,8 +150,8 @@ class GreenLabTests(unittest.TestCase):
                 )
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 launcher.verify_completion(Path(tmp) / "integration/gemma4b/warmup", "gemma4b", 1)
-                self.assertEqual([item["max_tokens"] for item in received[2:]], [1000, 500, 100] * 2)
-                self.assertEqual(received[2]["messages"][0]["content"], "Describe photosynthesis.")
+                self.assertEqual([item["max_tokens"] for item in received[2:]], [1250, 650, 120] * 2)
+                self.assertEqual(received[2]["messages"][0]["content"], Config.PROMPTS["text"].format(word_count=1000))
                 self.assertFalse(list((Path(tmp) / "integration").rglob("energibridge.csv")))
         finally:
             server.shutdown()
@@ -136,7 +161,7 @@ class GreenLabTests(unittest.TestCase):
     def test_invalid_response_fails_warmup(self):
         with tempfile.TemporaryDirectory() as tmp:
             config = self.config(tmp, "warmup")
-            context = SimpleNamespace(run_dir=Path(tmp), execute_run={"prompt_type": "text", "max_tokens": 100})
+            context = SimpleNamespace(run_dir=Path(tmp), execute_run={"prompt_type": "text", "max_tokens": 120})
             with patch("subprocess.run", side_effect=lambda *a, **k: (Path(tmp) / "response.json").write_text('{"error":"bad"}')):
                 with self.assertRaises(ValueError):
                     config.interact(context)
@@ -186,7 +211,7 @@ class GreenLabTests(unittest.TestCase):
                             launcher.run_model("gemma4b", Path(tmp), args)
                     else:
                         launcher.run_model("gemma4b", Path(tmp), args)
-                        self.assertEqual(events, ["warmup", 1, 1, 1, 1, 1, "main"])
+                        self.assertEqual(events, ["warmup"] + [1] * 10 + ["main"])
                     start.assert_called_once()
                     command = start.call_args.args[0]
                     self.assertEqual(command[command.index("-c") + 1], "8192")
@@ -218,7 +243,7 @@ class GreenLabTests(unittest.TestCase):
             for extra, prompt_tokens in (({}, 8150), ({"__verbose": {"truncated": True}}, 10)):
                 with tempfile.TemporaryDirectory() as tmp:
                     config = self.config(tmp, phase)
-                    context = SimpleNamespace(run_dir=Path(tmp), execute_run={"prompt_type": "text", "max_tokens": 100})
+                    context = SimpleNamespace(run_dir=Path(tmp), execute_run={"prompt_type": "text", "max_tokens": 120})
                     response = {"choices": [{"message": {"content": "text"}}],
                                 "usage": {"prompt_tokens": prompt_tokens, "completion_tokens": 2}, **extra}
                     with patch("subprocess.run", side_effect=lambda *a, **k: (Path(tmp) / "response.json").write_text(json.dumps(response))):
@@ -264,6 +289,7 @@ class GreenLabTests(unittest.TestCase):
             metadata = json.loads((session / "session.json").read_text())
             self.assertEqual(metadata["status"], "complete")
             self.assertEqual(metadata["prompts"], Config.PROMPTS)
+            self.assertEqual(metadata["word_targets"], {"1250": 1000, "650": 500, "120": 100})
             self.assertFalse(metadata["cache_prompt"])
             import hashlib
             self.assertEqual(metadata["image"]["sha256"], hashlib.sha256(original).hexdigest())

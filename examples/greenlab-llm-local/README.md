@@ -13,13 +13,13 @@ for every configuration (18 warmup and 36 measured requests total). The second r
 the full experiment (180 warmup and 540 measured requests).
 
 Models run sequentially: Gemma 4B, Qwen 3B, then Qwen 7B. Each model is loaded once,
-warmed up and measured at `max_tokens` 1000, 500, and 100 for both `prompt_type`
+warmed up and measured at `max_tokens` 1250, 650, and 120 for both `prompt_type`
 values, `text` and `image`, and then unloaded. There are 18 configurations total.
 Full runs use 10 warmup repetitions and 30 measured repetitions per combination:
 60 warmup and 180 measured requests per model. Measured repetitions are shuffled
 together across all six combinations within each model.
-Warmup has no inter-run delay. A fixed 5-second pause separates phases, and the
-runner waits 5 seconds after each measured repetition (including the final one).
+Warmup has no inter-run delay. A fixed 10-second pause separates phases, and the
+runner waits 10 seconds after each measured repetition (including the final one).
 This fixed pause does not verify thermal equilibrium.
 
 The launcher owns the server across both Runner executions. Invoke the launcher,
@@ -35,8 +35,21 @@ and the requested context size before warmup. The `-hf` model loader must load t
 matching vision projector. Missing vision support aborts the session.
 
 `max_tokens` is an output ceiling; a model can stop before reaching it. Input size
-is not a factor. Text input is exactly "Describe photosynthesis." Image input is
-"Describe this image." plus the same supplied photosynthesis image for every run.
+is not a factor. Both prompt types request a concise **Title** and **Main text**.
+Text requests explain photosynthesis; image requests describe and explain the
+photosynthesis shown in the same supplied image for every run. The explicit
+`WORD_TARGETS` mapping in `RunnerConfig.py` sets the approximate main-text length:
+
+| Maximum output tokens | Requested main-text words |
+|---:|---:|
+| 1250 | 1000 |
+| 650 | 500 |
+| 120 | 100 |
+
+Only the main text counts toward the word target. The output token ceiling covers
+the title and formatting too, so a response may stop before the requested length.
+There are no automatic retries or token-limit increases to enforce word counts.
+Warmup and measurement use the same rendered prompts.
 These are related tasks, not identical input information. Temperature is zero,
 streaming is disabled, and `cache_prompt=false` is explicit for every request.
 The model remains loaded, but prompt KV-cache reuse is disabled.
@@ -72,17 +85,20 @@ option. Warmup executes curl directly and does not profile energy.
 
 Each invocation creates a fresh timestamp/UUID session beneath `~/GreenLab/results`
 (or `--results-dir`). `session.json` records settings, both instructions, context
-size, cache policy, image filename/dimensions/SHA-256, and final status. `inputs/`
+size, cache policy, token-to-word mapping (`word_targets`), image
+filename/dimensions/SHA-256, and final status. JSON mapping keys are token limits
+encoded as strings; `prompts` stores the templates, and each request file stores
+the fully rendered instruction. `inputs/`
 holds the original image snapshot. Each model has `server.log`, `server.json`
 (command and PID), `server_props.json`, and separate `warmup/` and `main/`
 Runner outputs. Warmup keeps request/response diagnostics and completion records,
 but no energy CSV or metric files. Analyze only `main/` measurement outputs.
 
 Both run tables include `model`, `prompt_type`, and `max_tokens`. Each run has
-`run_metadata.json` identifying its phase and configuration. Measured runs also
+`run_metadata.json` identifying its phase, configuration, and `target_words`. Measured runs also
 have `metrics.json` with configuration identifiers and the existing metrics, plus
-the raw `energibridge.csv`. Run indices 0–2 represent text at 1000/500/100 tokens;
-indices 3–5 represent image at 1000/500/100. Prefer the factor columns when analyzing.
+the raw `energibridge.csv`. Run indices 0–2 represent text at 1250/650/120 tokens;
+indices 3–5 represent image at 1250/650/120. Prefer the factor columns when analyzing.
 
 Measured metrics retain their existing definitions: duration includes the profiler
 wrapper, and `mean_energy_usage` is the CPU package energy delta in joules, not

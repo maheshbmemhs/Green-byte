@@ -21,7 +21,8 @@ import statistics
 class RunnerConfig:
     operation_type = OperationType.AUTO
     self_measure = False
-    TOKEN_LIMITS = [1000, 500, 100]
+    TOKEN_LIMITS = [1250, 650, 120]
+    WORD_TARGETS = {1250: 1000, 650: 500, 120: 100}
     PROMPT_TYPES = ["text", "image"]
 
     LLAMA = Path(
@@ -49,7 +50,20 @@ class RunnerConfig:
 
     URL = "http://127.0.0.1:8080"
 
-    PROMPTS = {"text": "Describe photosynthesis.", "image": "Describe this image."}
+    PROMPTS = {
+        "text": (
+            "Describe photosynthesis using the following fields:\n"
+            "1. Title: A concise title.\n"
+            "2. Main text: Approximately {word_count} words explaining photosynthesis.\n"
+            "Count only the main text toward the word target."
+        ),
+        "image": (
+            "Describe the image using the following fields:\n"
+            "1. Title: A concise title.\n"
+            "2. Main text: Approximately {word_count} words describing and explaining the image.\n"
+            "Count only the main text toward the word target."
+        ),
+    }
 
 
     def __init__(self):
@@ -69,7 +83,7 @@ class RunnerConfig:
         self.ENERGIBRIDGE = os.environ.get("GREENLAB_ENERGIBRIDGE", self.ENERGIBRIDGE)
         smoke = os.environ.get("GREENLAB_SMOKE") == "1"
         self.repetitions = (1 if smoke else 10) if self.phase == "warmup" else (2 if smoke else 30)
-        self.time_between_runs_in_ms = 0 if self.phase == "warmup" else 5000
+        self.time_between_runs_in_ms = 0 if self.phase == "warmup" else 10000
         self.metrics = {}
 
         EventSubscriptionController.subscribe_to_multiple_events([
@@ -207,7 +221,7 @@ class RunnerConfig:
             raise RuntimeError("Launcher-owned model server is not healthy")
 
     def send_request(self, prompt_type, tokens, output_path):
-        content = self.PROMPTS[prompt_type]
+        content = self.PROMPTS[prompt_type].format(word_count=self.WORD_TARGETS[int(tokens)])
         if prompt_type == "image":
             mime = "image/png" if self.image_path.suffix.lower() == ".png" else "image/jpeg"
             encoded = base64.b64encode(self.image_path.read_bytes()).decode("ascii")
@@ -252,6 +266,7 @@ class RunnerConfig:
         (run_dir / "run_metadata.json").write_text(json.dumps({
             "model": self.model, "phase": self.phase,
             "prompt_type": prompt_type, "max_tokens": tokens,
+            "target_words": self.WORD_TARGETS[tokens],
             "context_size": self.context_size, "cache_prompt": False,
         }, indent=2))
 

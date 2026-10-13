@@ -171,8 +171,8 @@ def run_model(model, session, args):
             (directory / "server_props.json").write_text(json.dumps(props, indent=2))
             require_alive(server)
             run_phase(server, session, model, "warmup", args)
-            print(f"{model}: waiting 5 seconds before measurement", flush=True)
-            for _ in range(5):
+            print(f"{model}: waiting 10 seconds before measurement", flush=True)
+            for _ in range(10):
                 require_alive(server)
                 time.sleep(1)
             run_phase(server, session, model, "main", args)
@@ -193,7 +193,7 @@ def main():
     if not 1 <= args.port <= 65535:
         parser.error("--port must be between 1 and 65535")
     if args.ctx_size <= max(RunnerConfig.TOKEN_LIMITS) + 1:
-        parser.error("--ctx-size must leave room for input plus 1000 output tokens")
+        parser.error(f"--ctx-size must leave room for input plus {max(RunnerConfig.TOKEN_LIMITS)} output tokens")
     try:
         image_bytes, image_metadata = read_image(args.image.expanduser())
     except (OSError, ValueError) as exc:
@@ -215,10 +215,11 @@ def main():
     metadata = {
         "session": session_id, "models": RunnerConfig.MODELS,
         "max_tokens": RunnerConfig.TOKEN_LIMITS,
+        "word_targets": RunnerConfig.WORD_TARGETS,
         "warmup_repetitions": 1 if args.smoke else 10,
         "main_repetitions": 2 if args.smoke else 30,
         "warmup_shuffle": False, "main_shuffle": True,
-        "warmup_delay_s": 0, "main_delay_s": 5, "stabilization_s": 5,
+        "warmup_delay_s": 0, "main_delay_s": 10, "stabilization_s": 10,
         "prompts": RunnerConfig.PROMPTS, "prompt_types": RunnerConfig.PROMPT_TYPES,
         "image": image_metadata, "context_size": args.ctx_size, "cache_prompt": False,
         "energibridge": str(args.energibridge),
