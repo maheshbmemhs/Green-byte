@@ -11,6 +11,10 @@ venv
 examples/*
 !examples/greenlab-llm-local/
 !examples/greenlab-llm-local/**
+!examples/greenlab-llm-remote/
+examples/greenlab-llm-remote/*
+!examples/greenlab-llm-remote/*.py
+!examples/greenlab-llm-remote/README.md
 **/__pycache__/
 */.DS_Store
 .DS_Store
