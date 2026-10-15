@@ -183,6 +183,9 @@ def run_model(model, session, args):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--smoke", action="store_true", help="1 warmup and 2 measured repetitions per configuration")
+    parser.add_argument("--models", nargs="+", choices=list(RunnerConfig.MODELS),
+                        default=list(RunnerConfig.MODELS),
+                        help="Models to run in the specified order (default: all three)")
     parser.add_argument("--llama", type=Path, default=RunnerConfig.LLAMA)
     parser.add_argument("--energibridge", type=Path, default=RunnerConfig.ENERGIBRIDGE)
     parser.add_argument("--results-dir", type=Path, default=Path.home() / "GreenLab" / "results")
@@ -190,6 +193,8 @@ def main():
     parser.add_argument("--image", type=Path, required=True, help="Fixed photosynthesis image (PNG or JPEG)")
     parser.add_argument("--ctx-size", type=int, default=8192, help="Shared context size for text and image requests")
     args = parser.parse_args()
+    if len(args.models) != len(set(args.models)):
+        parser.error("--models must not contain duplicates")
     if not 1 <= args.port <= 65535:
         parser.error("--port must be between 1 and 65535")
     if args.ctx_size <= max(RunnerConfig.TOKEN_LIMITS) + 1:
@@ -213,7 +218,9 @@ def main():
     args.image.write_bytes(image_bytes)
     image_metadata["session_path"] = str(args.image.relative_to(session))
     metadata = {
-        "session": session_id, "models": RunnerConfig.MODELS,
+        "session": session_id,
+        "models": {model: RunnerConfig.MODELS[model] for model in args.models},
+        "model_order": args.models,
         "max_tokens": RunnerConfig.TOKEN_LIMITS,
         "word_targets": RunnerConfig.WORD_TARGETS,
         "warmup_repetitions": 1 if args.smoke else 10,
@@ -234,7 +241,7 @@ def main():
 
     previous = signal.signal(signal.SIGTERM, interrupted)
     try:
-        for model in RunnerConfig.MODELS:
+        for model in args.models:
             run_model(model, session, args)
         metadata["status"] = "complete"
     except BaseException as exc:

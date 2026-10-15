@@ -303,6 +303,37 @@ class GreenLabTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             launcher.wait_ready(Mock(poll=Mock(return_value=1)), "http://127.0.0.1:1")
 
+    def test_selected_models_and_order(self):
+        from PIL import Image
+        for selected in (["qwen3b", "qwen7b"], ["qwen7b", "qwen3b"], ["qwen3b"]):
+            with self.subTest(models=selected), tempfile.TemporaryDirectory() as tmp:
+                source = Path(tmp) / "diagram.png"
+                Image.new("RGB", (8, 8)).save(source)
+                sessions = Path(tmp) / "results"
+                argv = ["launcher", "--image", str(source), "--results-dir", str(sessions),
+                        "--llama", sys.executable, "--energibridge", sys.executable,
+                        "--models", *selected]
+                with patch.object(sys, "argv", argv), patch.object(launcher, "check_port"), \
+                     patch.object(launcher, "run_model") as run:
+                    launcher.main()
+                self.assertEqual([call.args[0] for call in run.call_args_list], selected)
+                metadata = json.loads((next(sessions.iterdir()) / "session.json").read_text())
+                self.assertEqual(list(metadata["models"]), selected)
+                self.assertEqual(metadata["model_order"], selected)
+                self.assertEqual(metadata["warmup_repetitions"], 10)
+                self.assertEqual(metadata["main_repetitions"], 30)
+
+    def test_invalid_model_selection(self):
+        import io
+        for selected in (["unknown"], ["qwen3b", "qwen3b"], []):
+            with patch.object(sys, "argv", ["launcher", "--image", "unused.png", "--models", *selected]), \
+                 patch("sys.stderr", new_callable=io.StringIO), \
+                 patch.object(launcher, "run_model") as run:
+                with self.assertRaises(SystemExit) as error:
+                    launcher.main()
+                self.assertEqual(error.exception.code, 2)
+                run.assert_not_called()
+
     def test_port_check_allows_closed_server_connections(self):
         import socket
 

@@ -26,6 +26,22 @@ The launcher owns the server across both Runner executions. Invoke the launcher,
 not `RunnerConfig.py` directly. An occupied port is an error. A server exit or
 incomplete phase aborts the session; it does not silently reload the model.
 
+To run only the remaining Qwen models after a Gemma session:
+
+```bash
+python examples/greenlab-llm-local/run_experiments.py \
+  --image /path/to/photosynthesis.png --models qwen3b qwen7b
+```
+
+Use the same image (the previous session's `inputs/` copy can be supplied).
+This creates a new session and preserves earlier results. Each selected model
+gets its full warmup and measured phases: 120 warmup and 360 measured requests
+total for these two models. `--smoke` also works with `--models`.
+Models run in the given order; unknown names and duplicates are rejected.
+Omitting `--models` runs all three models as before. Session metadata records
+only the selected models and their execution order. This option does not repair
+failed results or change energy-counter rollover handling.
+
 ## Machine setup
 
 The existing model repository identifiers, GPU layer counts, thread count (8), and
