@@ -42,9 +42,9 @@ class RunnerConfig:
             "gemma-3-4b":    "http://127.0.0.1:8083/v1/chat/completions",
     }
 
-    NETWORK_INTERFACE = "eth0"
+    NETWORK_INTERFACE = "wlp0s20f3"
 
-    IMAGE_PATH = Path("/home/kali/Downloads/flower.jpeg")
+    IMAGE_PATH = Path("/home/mahesh/Desktop/courses/Green_lab/lab_repo/experiment-runner/examples/greenlab-llm-local/image/photosynthesis.png")
 
     NETWORK_CONDITIONS = {
         "normal":   {"delay": None,    "rate": None},
@@ -95,7 +95,7 @@ class RunnerConfig:
         self.run_table_model = RunTableModel(
             factors=[factor_model, factor_type, factor_size, factor_network],
             exclude_combinations=[],
-            repetitions=30,
+            repetitions=1,
             shuffle=True,
             data_columns=['max_tokens', 'duration', 'tokens_generated', 'word_count', 'output_bytes', 'tokens_per_second',
                           'start_ts', 'end_ts']
@@ -192,7 +192,7 @@ class RunnerConfig:
             "tokens_generated": tokens,
             "word_count": word_count,
             "output_bytes": len(content_text.encode("utf-8")),
-+           "tokens_per_second": round(tokens / response_time_s, 2) if tokens and response_time_s else None,
+            "tokens_per_second": round(tokens / response_time_s, 2) if tokens and response_time_s else None,
             "start_ts": self._request_start,
             "end_ts": self._request_end,
         }

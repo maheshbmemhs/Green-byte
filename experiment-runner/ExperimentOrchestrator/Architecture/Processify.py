@@ -65,8 +65,7 @@ def processify(func):
 
         if error:
             ex_type, ex_value, tb_str = error
-            message = '%s (in subprocess)\n%s' % (str(ex_value), tb_str)
-            raise ex_type(message)
+            raise ex_value from RuntimeError('Subprocess traceback:\n%s' % tb_str)
 
         return result
 
@@ -91,8 +90,7 @@ def processify(func):
 
         if error:
             ex_type, ex_value, tb_str = error
-            message = '%s (in subprocess)\n%s' % (str(ex_value), tb_str)
-            raise ex_type(message)
+            raise ex_value from RuntimeError('Subprocess traceback:\n%s' % tb_str)
 
     @wraps(func)
     def wrapper(*args, **kwargs):
