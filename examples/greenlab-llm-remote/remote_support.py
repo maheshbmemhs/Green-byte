@@ -20,7 +20,7 @@ NETWORKS = {'normal': {}, 'degraded': {'delay': '50ms', 'rate': '20mbit'},
             'bad': {'delay': '100ms', 'rate': '5mbit'}}
 ENDPOINTS = {'gemma4b': 'http://127.0.0.1:8083', 'qwen3b': 'http://127.0.0.1:8081',
              'qwen7b': 'http://127.0.0.1:8082'}
-SSH_OPTIONS = ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10',
+SSH_OPTIONS = ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=30',
                '-o', 'ServerAliveInterval=5', '-o', 'ServerAliveCountMax=3']
 HANDLE = '7a10:'
 

@@ -6,6 +6,7 @@ from pathlib import Path
 import subprocess
 import sys
 import time
+import urllib.request
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from remote_support import LocalConfig, NETWORKS, Profiler, set_network, reset_network
@@ -14,6 +15,22 @@ from ConfigValidator.Config.Models.FactorModel import FactorModel
 
 
 class RunnerConfig(LocalConfig):
+    TOKEN_LIMITS = [2100, 1100, 300]
+    WORD_TARGETS = {2100: 1000, 1100: 500, 300: 100}
+    PROMPTS = {
+        **LocalConfig.PROMPTS,
+        "image": (
+            "Describe and explain the photosynthesis shown in this image.\n\n"
+            "1. Title: A concise title.\n"
+            "2. Main text: Aim for {word_count} words, up to 10% more.\n\n"
+            "Describe the visible elements, then explain their roles in photosynthesis, "
+            "the inputs and outputs, the stages of the process, and its biological importance. "
+            "Scale the level of detail to the requested word target. "
+            "Clearly distinguish what is visible in the image from additional scientific explanation.\n\n"
+            "Count only the main text toward the word target."
+        ),
+    }
+
     NETWORK_CONDITIONS = NETWORKS
 
     def __init__(self):
@@ -22,6 +39,13 @@ class RunnerConfig(LocalConfig):
         self.URL = self.settings['endpoints'][self.model]
         self.interface = self.settings['interface']
         self.context_size = self.settings['contexts'][self.model]
+
+    def server_ready(self):
+        try:
+            with urllib.request.urlopen(self.URL + '/health', timeout=10) as response:
+                return json.load(response).get('status') == 'ok'
+        except Exception:
+            return False
 
     @classmethod
     def build_run_table_model(cls, model, repetitions, measured=False):

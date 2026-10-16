@@ -1,7 +1,7 @@
 # Remote text/image experiments
 
-Keep the remote llama servers running and open the existing forwarding connection
-in another terminal:
+Open the existing forwarding connection in another terminal. You no longer need
+to start the model servers manually:
 
 ```bash
 ssh -N -L 8081:localhost:8081 -L 8082:localhost:8082 -L 8083:localhost:8083 gl_greenbyte@glg3
@@ -14,33 +14,85 @@ python -m pip install -r requirements.txt
 python examples/greenlab-llm-remote/run_experiments.py --image /path/to/photosynthesis.png --smoke
 ```
 
-Remove `--smoke` for the full experiment. To select models:
+Add `--skip-warmup` to omit warmup requests for every selected model. The server
+still loads and passes readiness checks, followed by the 10-second stabilization
+wait before measurement. Measurement counts, network conditions, and profiling
+are unchanged. This also works with `--smoke`. Session metadata records
+`skip_warmup: true` and `warmup_repetitions: 0`; no warmup run directories are created.
+
+```bash
+python examples/greenlab-llm-remote/run_experiments.py --image /path/to/photosynthesis.png --models qwen7b --skip-warmup
+```
+
+Warmups remain enabled by default. Remove `--smoke` for the full experiment. To select models:
 
 ```bash
 python examples/greenlab-llm-remote/run_experiments.py \
   --image /path/to/photosynthesis.png --models qwen3b qwen7b
 ```
 
-The launcher does not start, unload, or stop your model servers or tunnels.
-Default order is Gemma 4B (8083), Qwen 3B (8081), Qwen 7B (8082). Every selected
-endpoint must report the expected model ID, vision support, and a usable context
-via `/health`, `/v1/models`, and `/props`. It reads each server's actual context
-size; input plus requested output must fit. Start servers with `--no-context-shift`
-and sufficient context (8192 is the local experiment setting). Unexpected model
-aliases are rejected; use names containing the actual model family and size.
-Keep servers running without reloads throughout each model's phases. If all three
-remain resident, memory and idle-power conditions differ from the local setup.
+The launcher owns model startup and shutdown through SSH and tmux. On startup it
+checks that the selected localhost forwards are open, then
+stops only your legacy `qwen3b`, `qwen7b`, and `gemma` sessions (even when selecting
+a subset), records their process identities, and verifies all three remote model
+ports are free. An unrelated listener is an error; it is never killed by port or
+process-name matching.
+
+Default order is Gemma 4B (8083), Qwen 3B (8081), Qwen 7B (8082). Each model is loaded
+once, kept running through warmup and measurement, and stopped before the next is
+loaded. Models are stopped at the end; the manually opened tunnel remains running.
+Startup uses the exact remote repositories from your tmux commands (without adding
+quantization suffixes), `--host 127.0.0.1`, `--no-context-shift`, and one parallel slot.
+The launch command and actual `/props` and `/v1/models` responses are recorded.
+
+Lifecycle options:
+
+| Option | Default |
+|---|---|
+| `--remote-llama-dir` | `~/llama.cpp` (uses `build-cuda/bin/llama-server`) |
+| `--ctx-size` | `8192` |
+| `--gpu-layers` | Per model: Gemma 4B `999`, Qwen 3B `999`, Qwen 7B `20` |
+| `--startup-timeout` | `300` seconds |
+
+GPU-layer defaults reuse the local `RunnerConfig.GPU_LAYERS` mapping. Supplying
+`--gpu-layers N` overrides all selected models (including `0`). Session metadata
+records the explicit override in `gpu_layers` (null when omitted) and the resolved
+counts in `gpu_layers_by_model`; lifecycle logs also retain each launch command.
+
+The agent holds a remote account lock at `~/.cache/greenlab/remote-experiment.lock`
+before changing any servers. New tmux sessions are named
+`greenlab-<session-id>-<model>`. PID/start-time and tmux session-ID checks protect
+against signaling replacement processes. Shutdown requests SIGTERM, waits up to
+15 seconds, then uses SIGKILL only for the recorded identity if required. The next
+model cannot start until shutdown and port checks succeed.
+
+Health, model identity, vision support, and the configured context are checked
+after startup. The agent monitors the same PID throughout both phases, and the
+launcher checks its status every two seconds during runs. This control traffic
+is included in host activity during energy measurement. A failed server is never
+automatically reloaded. Startup time is outside energy measurement.
+
+On failure or interruption, the launcher stops Runner activity, restores network
+shaping, stops the owned model, and attempts to retrieve its log. EOF on the SSH
+control channel also triggers remote model cleanup. If connectivity is lost,
+shutdown cannot be guaranteed: inspect `server_lifecycle.json` for the remote
+session name and recorded PID/start time, and `server_control.log` for SSH errors.
+Remote `lifecycle.json` retains records even if the client misses an SSH reply.
 
 ## Matrix and phases
 
-The remote config reuses the current local config's prompts, word targets, image
-request construction, and token limits, including your 1250-token edit:
+The remote config reuses the local text prompt and image request construction.
+Its image prompt is defined in the remote `RunnerConfig.PROMPTS` and asks for a
+description plus scientific explanation, distinguishing visible details from
+additional knowledge. It targets the requested word count with up to 10% extra,
+scaling detail to the target. Word counts are instructions, not guarantees.
+Remote-specific token ceilings allow more room for the requested word counts:
 
 * Models: `gemma4b`, `qwen3b`, `qwen7b`.
 
 * Prompt types: text and image; fixed original image snapshot per session.
 
-* Output ceilings: 1250, 650, 120; main-text word targets: 1000, 500, 100.
+* Output ceilings: 2100, 1100, 300; main-text word targets: 1000, 500, 100.
 
 * Upload network conditions: normal, degraded (50 ms / 20 Mbit/s), bad (100 ms / 5 Mbit/s).
 
@@ -77,8 +129,7 @@ uses batch authentication and must work without a password prompt. Defaults:
 * `--remote-log-dir logs/greenlab-remote`
 
 These energy options accept command prefixes, not shell scripts. For example,
-`--remote-energy-command 'sudo -n /path/to/energibridge'`. No permission or server
-settings are changed automatically. The helper is sent over SSH and requires no
+`--remote-energy-command 'sudo -n /path/to/energibridge'`. No permission settings are changed automatically. The helper is sent over SSH and requires no
 installation on the server.
 
 Each measured request starts remote profiling, then local profiling, performs the
@@ -92,8 +143,8 @@ This differs from the local run's profiler-wrapper duration definition.
 
 Profiler helpers stop on control-channel EOF and have a 240-second watchdog.
 Request timeout remains 180 seconds. Failed inference/profiling aborts the session
-rather than continuing into the next model. Models and existing tunnels remain
-running. Raw remote files remain available if retrieval fails.
+rather than continuing into the next model. The owned model is stopped; existing
+tunnels remain running. Raw remote files remain available if retrieval fails.
 
 ## Results
 
@@ -103,7 +154,10 @@ this). Existing experiments and the old `results/` CSV are untouched.
 ```text
 <session>/
   session.json
+  server_lifecycle.json
+  server_control.log
   inputs/photosynthesis.png
+  <model>/server.log
   <model>/warmup/run_table.csv
   <model>/main/run_table.csv
   <model>/main/<run_id>/
@@ -131,5 +185,5 @@ No automatic resume: use `--models` to run remaining models in a new session.
 Tests (fake profilers and mocked network/SSH; no remote changes):
 
 ```bash
-python -m unittest test.test_greenlab_remote -v
+python -m unittest test.test_greenlab_remote test.test_remote_lifecycle -v
 ```

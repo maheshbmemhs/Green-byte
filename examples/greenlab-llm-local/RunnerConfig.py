@@ -54,13 +54,13 @@ class RunnerConfig:
         "text": (
             "Describe photosynthesis using the following fields:\n"
             "1. Title: A concise title.\n"
-            "2. Main text: Approximately {word_count} words explaining photosynthesis.\n"
+            "2. Main text: Exactly {word_count} words or slightly more explaining photosynthesis.\n"
             "Count only the main text toward the word target."
         ),
         "image": (
             "Describe the image using the following fields:\n"
             "1. Title: A concise title.\n"
-            "2. Main text: Approximately {word_count} words describing and explaining the image.\n"
+            "2. Main text: Exactly {word_count} words or slightly more describing and explaining the image.\n"
             "Count only the main text toward the word target."
         ),
     }

@@ -43,6 +43,34 @@ class RemoteTests(unittest.TestCase):
             self.assertEqual({r['network_condition'] for r in rows}, {'normal', 'degraded', 'bad'})
             self.assertEqual(len({(r['prompt_type'], r['max_tokens'], r['network_condition']) for r in rows}), 18)
 
+    def test_remote_word_targets_and_payloads(self):
+        self.assertEqual(support.LocalConfig.TOKEN_LIMITS, [1250, 650, 120])
+        self.assertEqual(Config.TOKEN_LIMITS, [2100, 1100, 300])
+        with tempfile.TemporaryDirectory() as tmp:
+            for phase in ('warmup', 'main'):
+                config = self.make_config(tmp, phase)
+                config.image_path = Path(tmp) / 'image.png'
+                config.image_path.write_bytes(b'image fixture')
+                for prompt_type in ('text', 'image'):
+                    for tokens, words in ((2100, 1000), (1100, 500), (300, 100)):
+                        with self.subTest(phase=phase, prompt_type=prompt_type, tokens=tokens):
+                            path = config.send_request(prompt_type, tokens, Path(tmp) / 'response.json')
+                            payload = json.loads(path.read_text())
+                            content = payload['messages'][0]['content']
+                            text = content if prompt_type == 'text' else content[0]['text']
+                            if prompt_type == 'image':
+                                self.assertIn(f'Aim for {words} words, up to 10% more.', text)
+                                self.assertIn('the inputs and outputs, the stages of the process', text)
+                                self.assertIn('additional scientific explanation', text)
+                                self.assertEqual(content[1]['image_url']['url'],
+                                                 'data:image/png;base64,aW1hZ2UgZml4dHVyZQ==')
+                            else:
+                                self.assertEqual(text, support.LocalConfig.PROMPTS['text'].format(word_count=words))
+                                self.assertIn(f'{words} words', text)
+                            self.assertNotIn('{word_count}', text)
+                            self.assertEqual(payload['max_tokens'], tokens)
+                            self.assertFalse(payload['cache_prompt'])
+
     def test_network_ownership(self):
         with patch.object(support, 'network_state', return_value=[{'root': True, 'kind': 'netem', 'handle': '123:'}]), \
              patch.object(support.subprocess, 'run') as run:
@@ -86,7 +114,7 @@ class RemoteTests(unittest.TestCase):
                 config = self.make_config(tmp, phase)
                 directory = Path(tmp) / 'run'
                 context = SimpleNamespace(run_dir=directory, execute_run={
-                    'model': 'qwen3b', 'prompt_type': 'text', 'max_tokens': 120, 'network_condition': 'degraded'})
+                    'model': 'qwen3b', 'prompt_type': 'text', 'max_tokens': 300, 'network_condition': 'degraded'})
                 csv_data = 'CPU_USAGE_0,USED_MEMORY,PACKAGE_ENERGY (J)\n10,1048576,1\n20,2097152,3\n'
                 if rollover:
                     csv_data = csv_data.replace('1048576,1', '1048576,262143')
@@ -161,7 +189,7 @@ class RemoteTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             config = self.make_config(tmp, 'main')
             context = SimpleNamespace(run_dir=Path(tmp) / 'run', execute_run={
-                'model': 'qwen3b', 'prompt_type': 'text', 'max_tokens': 120, 'network_condition': 'bad'})
+                'model': 'qwen3b', 'prompt_type': 'text', 'max_tokens': 300, 'network_condition': 'bad'})
             with patch.object(config, 'server_ready', return_value=True), \
                  patch.object(module, 'set_network', side_effect=RuntimeError('tc failed')), \
                  patch.object(module, 'reset_network') as reset, patch.object(module, 'Profiler') as profiler:
@@ -172,24 +200,62 @@ class RemoteTests(unittest.TestCase):
             self.assertTrue((Path(tmp) / 'failure.json').exists())
 
     def test_launcher_selected_models_and_phase_order(self):
+        self.check_launcher_gpu_layers(None)
+
+    def test_launcher_gpu_layers_override(self):
+        for override in (0, 17):
+            with self.subTest(override=override):
+                self.check_launcher_gpu_layers(override)
+
+    def test_launcher_skip_warmup(self):
+        for smoke in (False, True):
+            with self.subTest(smoke=smoke):
+                self.check_launcher_gpu_layers(None, skip_warmup=True, smoke=smoke)
+
+    def check_launcher_gpu_layers(self, override, skip_warmup=False, smoke=False):
         from PIL import Image
         with tempfile.TemporaryDirectory() as tmp:
             image = Path(tmp) / 'image.png'
             Image.new('RGB', (8, 8)).save(image)
             args = ['launcher', '--image', str(image), '--models', 'qwen3b', 'qwen7b',
                     '--results-dir', str(Path(tmp) / 'results'), '--interface', 'testwifi']
+            if skip_warmup:
+                args.append('--skip-warmup')
+            if smoke:
+                args.append('--smoke')
+            if override is not None:
+                args.extend(['--gpu-layers', str(override)])
             server = {'context_size': 8192, 'models': {'data': []}, 'props': {}}
+            manager = Mock()
+            manager.cleanup_legacy.return_value = []
+            manager.start.return_value = {'process': {'pid': 123, 'start_ticks': '1'}}
+            manager.stop.return_value = {'stopped_at': 1}
             with patch.object(sys, 'argv', args), patch.object(launcher, 'inspect_server', return_value=server), \
                  patch.object(launcher, 'check_network'), patch.object(launcher, 'reset_network'), \
-                 patch.object(launcher.time, 'sleep'), patch.object(launcher, 'run_phase') as phase:
+                 patch.object(launcher, 'check_forwarded_ports'), \
+                 patch.object(launcher.time, 'sleep') as sleep, patch.object(launcher, 'run_phase') as phase, \
+                 patch.object(launcher, 'RemoteLifecycle', return_value=manager):
                 launcher.main()
-            self.assertEqual([(c.args[1], c.args[2]) for c in phase.call_args_list],
-                             [('qwen3b', 'warmup'), ('qwen3b', 'main'), ('qwen7b', 'warmup'), ('qwen7b', 'main')])
+            expected_phases = [('qwen3b', 'main'), ('qwen7b', 'main')] if skip_warmup else [
+                ('qwen3b', 'warmup'), ('qwen3b', 'main'), ('qwen7b', 'warmup'), ('qwen7b', 'main')]
+            self.assertEqual([(c.args[1], c.args[2]) for c in phase.call_args_list], expected_phases)
+            self.assertEqual(sleep.call_count, 20)
+            self.assertTrue(all(c.args == (1,) for c in sleep.call_args_list))
             session = next((Path(tmp) / 'results').iterdir())
             settings = json.loads((session / 'session.json').read_text())
             self.assertEqual(settings['status'], 'complete')
             self.assertEqual(settings['model_order'], ['qwen3b', 'qwen7b'])
-            self.assertEqual(settings['main_repetitions'], 30)
+            self.assertEqual(settings['main_repetitions'], 2 if smoke else 30)
+            self.assertEqual(settings['skip_warmup'], skip_warmup)
+            self.assertEqual(settings['warmup_repetitions'], 0 if skip_warmup else (1 if smoke else 10))
+            self.assertEqual(settings['stabilization_s'], 10)
+            self.assertEqual(settings['gpu_layers'], override)
+            expected = {'qwen3b': 999, 'qwen7b': 20} if override is None else {'qwen3b': override, 'qwen7b': override}
+            self.assertEqual(settings['gpu_layers_by_model'], expected)
+            self.assertEqual(manager.start.call_count, 2)
+            self.assertEqual(manager.stop.call_count, 2)
+            manager.cleanup_legacy.assert_called_once()
+            manager.close.assert_called_once()
 
 
 if __name__ == '__main__':
