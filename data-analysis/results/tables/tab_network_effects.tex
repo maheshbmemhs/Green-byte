@@ -1,0 +1,27 @@
+\begin{table*}[tp]
+\centering
+\small
+\caption{Effect of network condition on remote inference (ART ANOVA, network main effect). Ratio = median bad / standard; $\delta$ = Cliff's delta, bad vs standard (median over the six size $\times$ modality cells); Cells = cells where bad differs from standard after Benjamini--Hochberg. The last two columns give $p$ for the interaction of network with content size and with input modality. All $p$-values in this table are Benjamini--Hochberg corrected over the table, per model.}
+\label{tab:network}
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{%
+\begin{tabular}{llrrrrrrr}
+\toprule
+Model & Metric & $p$ & $\eta^2_p$ & Ratio & $\delta$ & Cells & Size$\times$net. & Mod.$\times$net. \\
+\midrule
+Qwen2.5-VL-3B & Total energy & $<$0.001 & 0.08 & 1.06 & +0.33 & 3 of 6 & 0.150 & $<$0.001 \\
+ & Client (laptop) energy & $<$0.001 & 0.11 & 1.54 & +0.62 & 5 of 6 & 0.365 & $<$0.001 \\
+ & Execution time & $<$0.001 & 0.73 & 1.36 & +0.99 & 6 of 6 & 0.150 & $<$0.001 \\
+ & Throughput & $<$0.001 & 0.76 & 0.74 & -0.99 & 6 of 6 & $<$0.001 & $<$0.001 \\
+\midrule
+Gemma 3 4B & Total energy & $<$0.001 & 0.15 & 1.03 & +0.47 & 3 of 6 & 0.245 & $<$0.001 \\
+ & Client (laptop) energy & $<$0.001 & 0.31 & 1.20 & +0.81 & 6 of 6 & 0.007 & $<$0.001 \\
+ & Execution time & $<$0.001 & 0.79 & 1.24 & +1.00 & 6 of 6 & $<$0.001 & $<$0.001 \\
+ & Throughput & $<$0.001 & 0.80 & 0.81 & -1.00 & 6 of 6 & $<$0.001 & $<$0.001 \\
+\midrule
+Qwen2.5-VL-7B & Total energy & 0.039 & 0.01 & 1.00 & -0.02 & 1 of 6 & 0.999 & 0.016 \\
+ & Client (laptop) energy & 0.018 & 0.02 & 1.03 & +0.25 & 3 of 6 & 0.838 & 0.039 \\
+ & Execution time & $<$0.001 & 0.75 & 1.03 & +1.00 & 6 of 6 & 0.135 & $<$0.001 \\
+ & Throughput & $<$0.001 & 0.74 & 0.97 & -1.00 & 6 of 6 & $<$0.001 & $<$0.001 \\
+\bottomrule
+\end{tabular}}
+\end{table*}

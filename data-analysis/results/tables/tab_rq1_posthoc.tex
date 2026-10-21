@@ -1,0 +1,33 @@
+\begin{table}[tp]
+\centering
+\small
+\caption{Remote vs on-device $E_{total}$ per cell (Wilcoxon rank-sum, Benjamini--Hochberg). Ratio = median remote / median on-device.}
+\label{tab:rq1-posthoc}
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{%
+\begin{tabular}{llrrr}
+\toprule
+Model & Cell & Ratio & $p_{BH}$ & Cliff's $\delta$ \\
+\midrule
+Qwen2.5-VL-3B & text, short & 0.88 & 0.511 & -0.11 (negligible) \\
+ & text, medium & 0.92 & $<$0.001 & -0.80 (large) \\
+ & text, long & 1.47 & $<$0.001 & +1.00 (large) \\
+ & image, short & 1.05 & 0.549 & +0.09 (negligible) \\
+ & image, medium & 0.61 & $<$0.001 & -1.00 (large) \\
+ & image, long & 0.74 & $<$0.001 & -1.00 (large) \\
+\midrule
+Gemma 3 4B & text, short & 1.18 & 0.050 & +0.31 (small) \\
+ & text, medium & 0.86 & $<$0.001 & -1.00 (large) \\
+ & text, long & 0.91 & $<$0.001 & -1.00 (large) \\
+ & image, short & 1.06 & 0.327 & +0.16 (small) \\
+ & image, medium & 0.96 & 0.007 & -0.42 (medium) \\
+ & image, long & 0.92 & $<$0.001 & -1.00 (large) \\
+\midrule
+Qwen2.5-VL-7B & text, short & 4.12 & $<$0.001 & +1.00 (large) \\
+ & text, medium & 3.25 & $<$0.001 & +1.00 (large) \\
+ & text, long & 3.47 & $<$0.001 & +1.00 (large) \\
+ & image, short & 5.08 & $<$0.001 & +1.00 (large) \\
+ & image, medium & 2.69 & $<$0.001 & +1.00 (large) \\
+ & image, long & 2.79 & $<$0.001 & +1.00 (large) \\
+\bottomrule
+\end{tabular}}
+\end{table}

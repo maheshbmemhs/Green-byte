@@ -1,0 +1,96 @@
+[
+  {
+    "op": "init",
+    "time": 1792165995.5937214,
+    "result": {
+      "root": "/home/gl_greenbyte/logs/greenlab-remote/resume-a258d1703f0c",
+      "agent": {
+        "pid": 1233644,
+        "start_ticks": "165984494",
+        "ppid": 1233643
+      }
+    }
+  },
+  {
+    "op": "legacy",
+    "time": 1792165995.6193833,
+    "result": []
+  },
+  {
+    "op": "start_requested",
+    "model": "qwen7b",
+    "tmux_session": "greenlab-resume-a258d1703f0c-qwen7b",
+    "remote_directory": "logs/greenlab-remote/resume-a258d1703f0c/qwen7b",
+    "time": 1792165995.6197705
+  },
+  {
+    "op": "start",
+    "time": 1792165995.770042,
+    "result": {
+      "model": "qwen7b",
+      "tmux_session": "greenlab-resume-a258d1703f0c-qwen7b",
+      "command": [
+        "/home/gl_greenbyte/llama.cpp/build-cuda/bin/llama-server",
+        "-hf",
+        "ggml-org/Qwen2.5-VL-7B-Instruct-GGUF",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8082",
+        "-ngl",
+        "20",
+        "-c",
+        "8192",
+        "--no-context-shift",
+        "-np",
+        "1"
+      ],
+      "log": "/home/gl_greenbyte/logs/greenlab-remote/resume-a258d1703f0c/qwen7b/server.log",
+      "identity_file": "/home/gl_greenbyte/logs/greenlab-remote/resume-a258d1703f0c/qwen7b/process.json",
+      "starting_at": 1792165995.5473342,
+      "tmux_id": "$0",
+      "process": {
+        "pid": 1233651,
+        "start_ticks": "165984505"
+      }
+    }
+  },
+  {
+    "op": "stop",
+    "time": 1792172316.3475645,
+    "result": {
+      "model": "qwen7b",
+      "tmux_session": "greenlab-resume-a258d1703f0c-qwen7b",
+      "command": [
+        "/home/gl_greenbyte/llama.cpp/build-cuda/bin/llama-server",
+        "-hf",
+        "ggml-org/Qwen2.5-VL-7B-Instruct-GGUF",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8082",
+        "-ngl",
+        "20",
+        "-c",
+        "8192",
+        "--no-context-shift",
+        "-np",
+        "1"
+      ],
+      "log": "/home/gl_greenbyte/logs/greenlab-remote/resume-a258d1703f0c/qwen7b/server.log",
+      "identity_file": "/home/gl_greenbyte/logs/greenlab-remote/resume-a258d1703f0c/qwen7b/process.json",
+      "starting_at": 1792165995.5473342,
+      "tmux_id": "$0",
+      "process": {
+        "pid": 1233651,
+        "start_ticks": "165984505"
+      },
+      "stopped_at": 1792172316.3381126
+    }
+  },
+  {
+    "op": "close",
+    "time": 1792172317.4774792,
+    "result": null
+  }
+]

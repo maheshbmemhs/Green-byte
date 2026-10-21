@@ -1,0 +1,20 @@
+\begin{table}[tp]
+\centering
+\small
+\caption{RQ1: ART ANOVA on $R_E$, per model. Cells: $p$ ($\eta^2_p$).}
+\label{tab:rq1-re-anova}
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{%
+\begin{tabular}{lrrr}
+\toprule
+Effect & Qwen2.5-VL-3B & Gemma 3 4B & Qwen2.5-VL-7B \\
+\midrule
+size & $<$0.001 (0.60) & $<$0.001 (0.58) & $<$0.001 (0.89) \\
+modality & $<$0.001 (0.64) & $<$0.001 (0.06) & $<$0.001 (0.17) \\
+network & $<$0.001 (0.08) & $<$0.001 (0.14) & $<$0.001 (0.03) \\
+size x modality & $<$0.001 (0.67) & $<$0.001 (0.24) & $<$0.001 (0.94) \\
+size x network & 0.002 (0.03) & 0.001 (0.03) & 0.021 (0.02) \\
+modality x network & 0.099 (0.01) & $<$0.001 (0.04) & $<$0.001 (0.04) \\
+size x modality x network & 0.163 (0.01) & 0.138 (0.01) & 0.003 (0.03) \\
+\bottomrule
+\end{tabular}}
+\end{table}

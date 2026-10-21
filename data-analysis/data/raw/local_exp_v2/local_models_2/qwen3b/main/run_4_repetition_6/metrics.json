@@ -1,0 +1,13 @@
+{
+  "duration_s": 45.2422,
+  "prompt_tokens": 712,
+  "completion_tokens": 917,
+  "output_bytes": 4307,
+  "tokens_per_second": 20.2687,
+  "mean_cpu_usage": 5.23,
+  "mean_memory_usage": 9453.74,
+  "mean_energy_usage": 958.1841,
+  "model": "qwen3b",
+  "prompt_type": "image",
+  "max_tokens": 1100
+}

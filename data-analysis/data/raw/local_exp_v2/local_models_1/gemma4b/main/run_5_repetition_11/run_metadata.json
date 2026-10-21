@@ -1,0 +1,9 @@
+{
+  "model": "gemma4b",
+  "phase": "main",
+  "prompt_type": "image",
+  "max_tokens": 300,
+  "target_words": 100,
+  "context_size": 8192,
+  "cache_prompt": false
+}

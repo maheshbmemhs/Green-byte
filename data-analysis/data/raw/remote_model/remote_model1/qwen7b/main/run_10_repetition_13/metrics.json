@@ -1,0 +1,52 @@
+{
+  "model": "qwen7b",
+  "prompt_type": "image",
+  "max_tokens": "2100",
+  "network_condition": "degraded",
+  "resume_attempt": "resume-a258d1703f0c",
+  "phase": "main",
+  "target_words": 1000,
+  "context_size": 8192,
+  "cache_prompt": false,
+  "profiling_windows": {
+    "remote": {
+      "start": {
+        "status": "ready",
+        "time": 1792168139.6632977,
+        "pid": 1240049
+      },
+      "stop": {
+        "status": "done",
+        "time": 1792168184.473141
+      }
+    },
+    "local": {
+      "start": {
+        "status": "ready",
+        "time": 1792168141.2523048,
+        "pid": 2597516
+      },
+      "stop": {
+        "status": "done",
+        "time": 1792168184.3008938
+      }
+    }
+  },
+  "network_direction": "client_egress",
+  "remote_csv": "logs/greenlab-remote/resume-a258d1703f0c/qwen7b/main/run_10_repetition_13/remote_energy.csv",
+  "start_ts": 1792168141.252639,
+  "end_ts": 1792168184.0361922,
+  "duration_s": 42.7836,
+  "prompt_tokens": 713,
+  "completion_tokens": 996,
+  "output_bytes": 4632,
+  "tokens_per_second": 23.28,
+  "local_mean_cpu_usage": 0.75,
+  "local_mean_memory_usage": 11835.09,
+  "local_mean_energy_usage": 316.7073,
+  "local_energy_status": "ok",
+  "remote_mean_cpu_usage": 46.11,
+  "remote_mean_memory_usage": 3313.89,
+  "remote_mean_energy_usage": 6185.9586,
+  "remote_energy_status": "ok"
+}

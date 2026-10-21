@@ -1,0 +1,16 @@
+\begin{table*}[tp]
+\centering
+\small
+\caption{Energy--performance trade-off per model: number of the 18 configurations (modality $\times$ size $\times$ network) where remote inference is faster (median $R_T < 1$), faster and cheaper in total energy ($R_E < 1$) or per word ($R_{E,word} < 1$), or faster but more energy-intensive. Last column: the standard-network workloads where remote is faster and cheaper per word.}
+\label{tab:tradeoff}
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{%
+\begin{tabular}{lrrrrl}
+\toprule
+Model & Faster & Faster \& cheaper & \ldots{} per word & Faster, costs more & Faster \& cheaper per word in \\
+\midrule
+Qwen2.5-VL-3B & 18 / 18 & 10 & 10 & 8 & text medium, image medium, text long, image long \\
+Gemma 3 4B & 18 / 18 & 10 & 12 & 8 & text medium, image medium, text long, image long \\
+Qwen2.5-VL-7B & 18 / 18 & 0 & 0 & 18 & -- \\
+\bottomrule
+\end{tabular}}
+\end{table*}

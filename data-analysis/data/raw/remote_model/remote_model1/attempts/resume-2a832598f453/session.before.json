@@ -1,0 +1,269 @@
+{
+  "models": {
+    "qwen7b": "ggml-org/Qwen2.5-VL-7B-Instruct-GGUF"
+  },
+  "model_order": [
+    "qwen7b"
+  ],
+  "endpoints": {
+    "qwen7b": "http://127.0.0.1:8082"
+  },
+  "servers": {
+    "qwen7b": {
+      "props": {
+        "default_generation_settings": {
+          "params": {
+            "seed": 4294967295,
+            "temperature": 0.800000011920929,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 40,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "max_tokens": -1,
+            "n_predict": -1,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": false,
+            "stream": false,
+            "n_probs": 0,
+            "min_keep": 0,
+            "chat_format": "Content-only",
+            "reasoning_format": "none",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "n_ctx": 8192
+        },
+        "total_slots": 1,
+        "model_alias": "ggml-org/Qwen2.5-VL-7B-Instruct-GGUF",
+        "model_ftype": "Q4_K - Medium",
+        "model_path": "/home/gl_greenbyte/.cache/huggingface/hub/models--ggml-org--Qwen2.5-VL-7B-Instruct-GGUF/snapshots/508edd0afaa66bb9e9f40587acc2184f02daf1f6/Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf",
+        "modalities": {
+          "vision": true,
+          "video": true,
+          "audio": false
+        },
+        "media_marker": "<__media_FgwjmbgU1NrcZcInBa41EOovibubJagO__>",
+        "endpoint_slots": true,
+        "endpoint_props": false,
+        "endpoint_metrics": false,
+        "ui": true,
+        "ui_settings": {},
+        "chat_template": "{% set image_count = namespace(value=0) %}{% set video_count = namespace(value=0) %}{% for message in messages %}{% if loop.first and message['role'] != 'system' %}<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n{% endif %}<|im_start|>{{ message['role'] }}\n{% if message['content'] is string %}{{ message['content'] }}<|im_end|>\n{% else %}{% for content in message['content'] %}{% if content['type'] == 'image' or 'image' in content or 'image_url' in content %}{% set image_count.value = image_count.value + 1 %}{% if add_vision_id %}Picture {{ image_count.value }}: {% endif %}<|vision_start|><|image_pad|><|vision_end|>{% elif content['type'] == 'video' or 'video' in content %}{% set video_count.value = video_count.value + 1 %}{% if add_vision_id %}Video {{ video_count.value }}: {% endif %}<|vision_start|><|video_pad|><|vision_end|>{% elif 'text' in content %}{{ content['text'] }}{% endif %}{% endfor %}<|im_end|>\n{% endif %}{% endfor %}{% if add_generation_prompt %}<|im_start|>assistant\n{% endif %}",
+        "chat_template_caps": {
+          "supports_object_arguments": false,
+          "supports_parallel_tool_calls": false,
+          "supports_preserve_reasoning": false,
+          "supports_reasoning_effort": false,
+          "supports_string_content": true,
+          "supports_system_role": true,
+          "supports_tool_calls": false,
+          "supports_tools": false,
+          "supports_typed_content": true
+        },
+        "bos_token": "<|endoftext|>",
+        "eos_token": "<|im_end|>",
+        "build_info": "b11200-81bc6b83f",
+        "is_sleeping": false,
+        "cors_proxy_enabled": false
+      },
+      "models": {
+        "models": [
+          {
+            "name": "ggml-org/Qwen2.5-VL-7B-Instruct-GGUF",
+            "model": "ggml-org/Qwen2.5-VL-7B-Instruct-GGUF",
+            "modified_at": "",
+            "size": "",
+            "digest": "",
+            "type": "model",
+            "description": "",
+            "tags": [
+              ""
+            ],
+            "capabilities": [
+              "completion",
+              "multimodal"
+            ],
+            "parameters": "",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "",
+              "families": [
+                ""
+              ],
+              "parameter_size": "",
+              "quantization_level": ""
+            }
+          }
+        ],
+        "object": "list",
+        "data": [
+          {
+            "id": "ggml-org/Qwen2.5-VL-7B-Instruct-GGUF",
+            "aliases": [
+              "ggml-org/Qwen2.5-VL-7B-Instruct-GGUF"
+            ],
+            "tags": [],
+            "object": "model",
+            "created": 1792159970,
+            "owned_by": "llamacpp",
+            "meta": {
+              "vocab_type": 2,
+              "n_vocab": 152064,
+              "n_ctx": 8192,
+              "n_ctx_train": 128000,
+              "n_embd": 3584,
+              "n_params": 7615616512,
+              "size": 4677120000,
+              "ftype": "Q4_K - Medium"
+            }
+          }
+        ]
+      },
+      "context_size": 8192
+    }
+  },
+  "contexts": {
+    "qwen7b": 8192
+  },
+  "remote_llama_dir": "~/llama.cpp",
+  "ctx_size": 8192,
+  "gpu_layers": null,
+  "gpu_layers_by_model": {
+    "qwen7b": 20
+  },
+  "startup_timeout": 300,
+  "interface": "wlp0s20f3",
+  "network_conditions": {
+    "normal": {},
+    "degraded": {
+      "delay": "50ms",
+      "rate": "20mbit"
+    },
+    "bad": {
+      "delay": "100ms",
+      "rate": "5mbit"
+    }
+  },
+  "network_direction": "client_egress",
+  "remote_host": "gl_greenbyte@glg3",
+  "remote_log_dir": "logs/greenlab-remote",
+  "local_energy_command": [
+    "sudo",
+    "-n",
+    "energibridge"
+  ],
+  "remote_energy_command": [
+    "energibridge"
+  ],
+  "prompts": {
+    "text": "Describe photosynthesis using the following fields:\n1. Title: A concise title.\n2. Main text: Exactly {word_count} words or slightly more explaining photosynthesis.\nCount only the main text toward the word target.",
+    "image": "Describe and explain the photosynthesis shown in this image.\n\n1. Title: A concise title.\n2. Main text: Aim for {word_count} words, up to 10% more.\n\nDescribe the visible elements, then explain their roles in photosynthesis, the inputs and outputs, the stages of the process, and its biological importance. Scale the level of detail to the requested word target. Clearly distinguish what is visible in the image from additional scientific explanation.\n\nCount only the main text toward the word target."
+  },
+  "max_tokens": [
+    2100,
+    1100,
+    300
+  ],
+  "word_targets": {
+    "2100": 1000,
+    "1100": 500,
+    "300": 100
+  },
+  "cache_prompt": false,
+  "image": {
+    "path": "inputs/photosynthesis.png",
+    "sha256": "d8724d87f0d02a19853ce26dcfb0afd20937edeac8362259d4facc800ab8ad0d",
+    "dimensions": [
+      780,
+      575
+    ]
+  },
+  "skip_warmup": true,
+  "warmup_repetitions": 0,
+  "main_repetitions": 30,
+  "main_delay_s": 10,
+  "stabilization_s": 10,
+  "warmup_delay_s": 0,
+  "status": "failed",
+  "legacy_cleanup": [],
+  "server_lifecycle": {
+    "qwen7b": {
+      "model": "qwen7b",
+      "tmux_session": "greenlab-resume-a42249774803-qwen7b",
+      "command": [
+        "/home/gl_greenbyte/llama.cpp/build-cuda/bin/llama-server",
+        "-hf",
+        "ggml-org/Qwen2.5-VL-7B-Instruct-GGUF",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8082",
+        "-ngl",
+        "20",
+        "-c",
+        "8192",
+        "--no-context-shift",
+        "-np",
+        "1"
+      ],
+      "log": "/home/gl_greenbyte/logs/greenlab-remote/resume-a42249774803/qwen7b/server.log",
+      "identity_file": "/home/gl_greenbyte/logs/greenlab-remote/resume-a42249774803/qwen7b/process.json",
+      "starting_at": 1792159968.0304885,
+      "tmux_id": "$0",
+      "process": {
+        "pid": 1214951,
+        "start_ticks": "165381753"
+      },
+      "stopped_at": 1792165766.983427
+    }
+  },
+  "resume_attempts": [
+    {
+      "id": "resume-a42249774803",
+      "started_at": 1792159964.3212001,
+      "skip_warmup": true,
+      "warmup_repetitions": 0,
+      "legacy_cleanup": [],
+      "status": "failed",
+      "error": "qwen7b main failed",
+      "ended_at": 1792165768.1875007
+    }
+  ],
+  "error": "qwen7b main failed"
+}

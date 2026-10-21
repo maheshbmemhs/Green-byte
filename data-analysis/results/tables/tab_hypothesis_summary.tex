@@ -1,0 +1,36 @@
+\begin{table*}[tp]
+\centering
+\small
+\caption{Hypothesis tests per model (ART ANOVA). Cells: $p$ after Benjamini--Hochberg correction within each research question ($\eta^2_p$). $H_0$ is rejected when $p < 0.05$; $\dagger$ = fail to reject $H_0$.}
+\label{tab:hypotheses}
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{%
+\begin{tabular}{ll rrr}
+\toprule
+Hypothesis & $H_1$ & Qwen2.5-VL-3B & Gemma 3 4B & Qwen2.5-VL-7B \\
+\midrule
+RQ1 & $R_E$ differs by content size & $<$0.001 (0.60) & $<$0.001 (0.58) & $<$0.001 (0.89) \\
+ & $R_E$ differs by input modality & $<$0.001 (0.64) & $<$0.001 (0.06) & $<$0.001 (0.17) \\
+ & $R_E$ differs by network condition & $<$0.001 (0.08) & $<$0.001 (0.14) & $<$0.001 (0.03) \\
+\midrule
+RQ1.1-A & Energy differs between on-device and remote & 0.004 (0.02) & $<$0.001 (0.71) & $<$0.001 (0.76) \\
+\midrule
+RQ1.1-B & Energy differs across content sizes & $<$0.001 (0.89) & $<$0.001 (0.89) & $<$0.001 (0.89) \\
+\midrule
+RQ1.1-AB & Approach effect depends on content size & $<$0.001 (0.86) & $<$0.001 (0.61) & $<$0.001 (0.97) \\
+\midrule
+RQ1.2-A & Energy differs between on-device and remote & 0.004 (0.02) & $<$0.001 (0.71) & $<$0.001 (0.76) \\
+\midrule
+RQ1.2-B & Energy differs between text and image & $<$0.001 (0.75) & 0.054$^{\dagger}$ (0.01) & $<$0.001 (0.55) \\
+\midrule
+RQ1.2-AB & Approach effect depends on input modality & $<$0.001 (0.75) & $<$0.001 (0.12) & $<$0.001 (0.75) \\
+\midrule
+RQ1.3-N & Remote energy differs across networks & $<$0.001 (0.08) & $<$0.001 (0.15) & 0.028 (0.01) \\
+\midrule
+RQ1.3-G & $R_E$ differs across networks & $<$0.001 (0.08) & $<$0.001 (0.14) & $<$0.001 (0.03) \\
+\midrule
+RQ2 & $R_E$ differs across networks & $<$0.001 (0.08) & $<$0.001 (0.14) & $<$0.001 (0.03) \\
+ & $R_T$ differs across networks & $<$0.001 (0.73) & $<$0.001 (0.77) & $<$0.001 (0.50) \\
+ & Remote throughput differs across networks & $<$0.001 (0.76) & $<$0.001 (0.80) & $<$0.001 (0.74) \\
+\bottomrule
+\end{tabular}}
+\end{table*}

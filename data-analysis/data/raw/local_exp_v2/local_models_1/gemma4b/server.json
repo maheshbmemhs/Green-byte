@@ -1,0 +1,21 @@
+{
+  "pid": 3280434,
+  "command": [
+    "/media/mahesh/New Volume/courses/GreenLab/repo/llama.cpp/build-cuda/bin/llama-server",
+    "-hf",
+    "ggml-org/gemma-3-4b-it-GGUF",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "8080",
+    "-c",
+    "8192",
+    "--no-context-shift",
+    "-t",
+    "8",
+    "-np",
+    "1",
+    "-ngl",
+    "999"
+  ]
+}

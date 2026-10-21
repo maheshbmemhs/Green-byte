@@ -1,0 +1,52 @@
+{
+  "model": "qwen7b",
+  "prompt_type": "text",
+  "max_tokens": "2100",
+  "network_condition": "bad",
+  "resume_attempt": "resume-a42249774803",
+  "phase": "main",
+  "target_words": 1000,
+  "context_size": 8192,
+  "cache_prompt": false,
+  "profiling_windows": {
+    "remote": {
+      "start": {
+        "status": "ready",
+        "time": 1792163279.4435973,
+        "pid": 1224871
+      },
+      "stop": {
+        "status": "done",
+        "time": 1792163342.2765136
+      }
+    },
+    "local": {
+      "start": {
+        "status": "ready",
+        "time": 1792163280.969464,
+        "pid": 2513772
+      },
+      "stop": {
+        "status": "done",
+        "time": 1792163341.9729154
+      }
+    }
+  },
+  "network_direction": "client_egress",
+  "remote_csv": "logs/greenlab-remote/resume-a42249774803/qwen7b/main/run_2_repetition_26/remote_energy.csv",
+  "start_ts": 1792163280.9697542,
+  "end_ts": 1792163341.8090692,
+  "duration_s": 60.8393,
+  "prompt_tokens": 64,
+  "completion_tokens": 1482,
+  "output_bytes": 7402,
+  "tokens_per_second": 24.3592,
+  "local_mean_cpu_usage": "",
+  "local_mean_memory_usage": "",
+  "local_mean_energy_usage": "",
+  "local_energy_status": "Energy counter decreased: rollover/reset; raw CSV retained",
+  "remote_mean_cpu_usage": 48.3,
+  "remote_mean_memory_usage": 3378.39,
+  "remote_mean_energy_usage": 9055.4547,
+  "remote_energy_status": "ok"
+}

@@ -1,0 +1,38 @@
+{
+  "model": "qwen3b",
+  "prompt_type": "image",
+  "max_tokens": 2100,
+  "network_condition": "normal",
+  "phase": "main",
+  "target_words": 1000,
+  "context_size": 8192,
+  "cache_prompt": false,
+  "profiling_windows": {
+    "remote": {
+      "start": {
+        "status": "ready",
+        "time": 1792123282.428876,
+        "pid": 1094862
+      },
+      "stop": {
+        "status": "done",
+        "time": 1792123288.0249074
+      }
+    },
+    "local": {
+      "start": {
+        "status": "ready",
+        "time": 1792123283.9737337,
+        "pid": 1848389
+      },
+      "stop": {
+        "status": "done",
+        "time": 1792123287.7595794
+      }
+    }
+  },
+  "network_direction": "client_egress",
+  "remote_csv": "logs/greenlab-remote/20261015T233805Z-a6af98c0/qwen3b/main/run_9_repetition_20/remote_energy.csv",
+  "start_ts": 1792123283.9739602,
+  "end_ts": 1792123287.5455356
+}

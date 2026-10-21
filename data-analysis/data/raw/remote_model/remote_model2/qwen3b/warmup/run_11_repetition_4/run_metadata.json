@@ -1,0 +1,14 @@
+{
+  "model": "qwen3b",
+  "prompt_type": "image",
+  "max_tokens": 2100,
+  "network_condition": "bad",
+  "phase": "warmup",
+  "target_words": 1000,
+  "context_size": 8192,
+  "cache_prompt": false,
+  "profiling_windows": {},
+  "network_direction": "client_egress",
+  "start_ts": 1792120728.418512,
+  "end_ts": 1792120736.3497775
+}
