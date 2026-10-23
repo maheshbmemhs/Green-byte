@@ -60,26 +60,18 @@ save_fig(net_box("client_energy_j", "Client (laptop) energy (J)",
                  "Remote inference: laptop energy per run (the part the network affects most)"),
          "fig_rq1_3_client_energy", height = 6)
 
-split <- aggregate(cbind(client_energy_j, server_energy_j) ~ model_label + content_size + network_condition,
-                   data = rem, FUN = mean)
-long <- rbind(data.frame(split[1:3], part = "Server", energy = split$server_energy_j),
-              data.frame(split[1:3], part = "Client (laptop)", energy = split$client_energy_j))
-long$part <- factor(long$part, levels = c("Client (laptop)", "Server"))
-share <- aggregate(cbind(client_energy_j, server_energy_j) ~ model_label, data = rem, FUN = sum)
-share$label <- sprintf("laptop share: %.0f%%", 100 * share$client_energy_j /
-                         (share$client_energy_j + share$server_energy_j))
-share$content_size <- factor("short", levels = SIZES)
-p <- ggplot(long, aes(network_condition, energy, fill = part)) +
-  geom_col(width = 0.8, colour = "white", linewidth = 0.3) +
-  geom_text(data = share, aes(x = -Inf, y = Inf, label = label), inherit.aes = FALSE,
-            hjust = -0.1, vjust = 1.4, size = 2.3, colour = COL$ink2) +
-  scale_fill_manual(values = c("Client (laptop)" = COL$client, "Server" = COL$server)) +
-  scale_x_discrete(labels = c(standard = "S", degraded = "D", bad = "B")) +
-  scale_y_continuous(labels = scales::label_comma()) +
-  facet_grid(model_label ~ content_size, scales = "free_y",
-             labeller = labeller(content_size = c(short = "Short", medium = "Medium", long = "Long"))) +
-  labs(title = "Where remote energy is spent (mean per run, text and image pooled)",
-       subtitle = "S / D / B = standard / degraded / bad network",
-       x = "Network condition", y = "Mean energy per run (J)") +
+parts <- rbind(data.frame(rem[c("model_label", "content_size", "series")], part = "Client (laptop)",
+                          energy = rem$client_energy_j),
+               data.frame(rem[c("model_label", "content_size", "series")], part = "Server",
+                          energy = rem$server_energy_j))
+p <- ggplot(parts, aes(content_size, energy)) +
+  geom_box(0.75) +
+  scale_fill_manual(values = COL_SERIES) + scale_colour_manual(values = COL_SERIES) +
+  scale_x_discrete(labels = c(short = "Short", medium = "Medium", long = "Long")) +
+  scale_y_continuous(labels = scales::label_comma(), limits = c(0, NA)) +
+  facet_wrap(~ model_label + part, ncol = 2, scales = "free_y",
+             labeller = function(l) list(paste(l$model_label, l$part, sep = " - "))) +
+  labs(title = "Remote energy per run, laptop and server (text and image pooled)",
+       x = "Requested content size", y = "Energy per run (J)") +
   theme_greenlab()
-save_fig(p, "fig_rq1_3_server_vs_client", height = 3.8)
+save_fig(p, "fig_rq1_3_energy_parts", height = 5, paper_height = 2.7)

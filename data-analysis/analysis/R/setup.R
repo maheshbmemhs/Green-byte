@@ -78,15 +78,16 @@ geom_box <- function(width = 0.75) {
                key_glyph = draw_key_rect)
 }
 
-# saves pdf + png, and a version without title for the paper (results/figures/paper)
+# saves pdf + png (results/figures/paper)
 save_fig <- function(p, name, width = 7, height = 4.5, paper_width = width,
-                     paper_height = min(height * 0.9, 4.3)) {
+                     paper_height = min(height * 0.9, 4.3), paper_extra = NULL) {
   ggsave(file.path(DIR_FIGURES, paste0(name, ".pdf")), p, width = width, height = height,
          device = "pdf", bg = "white")
   ggsave(file.path(DIR_FIGURES, paste0(name, ".png")), p, width = width, height = height,
          dpi = 300, bg = "white")
   dir.create(file.path(DIR_FIGURES, "paper"), showWarnings = FALSE)
   paper <- p + labs(title = NULL, subtitle = NULL, caption = NULL)
+  if (!is.null(paper_extra)) paper <- paper + paper_extra
   ggsave(file.path(DIR_FIGURES, "paper", paste0(name, ".pdf")), paper, width = paper_width,
          height = paper_height, device = "pdf", bg = "white")
   message("  figure: ", file.path(DIR_FIGURES, name), ".pdf/.png (+ paper/)")

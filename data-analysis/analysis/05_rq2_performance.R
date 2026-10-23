@@ -88,7 +88,7 @@ p <- ggplot(tr, aes(R_T, R_E)) +
        caption = if (is.null(cap)) NULL else paste(strwrap(cap, 60), collapse = "\n")) +
   theme_greenlab() + theme(panel.grid.major.x = element_line(colour = COL$grid, linewidth = 0.3),
                            legend.box = "vertical")
-save_fig(p, "fig_rq2_tradeoff", width = 3.4, height = 3.9)
+save_fig(p, "fig_rq2_tradeoff", width = 3.4, height = 3.9, paper_height = 2.9)
 
 cls <- aggregate(cbind(R_E, R_E_word, R_T) ~ model + input_modality + content_size + network_condition,
                  data = matched, FUN = median)
@@ -101,25 +101,17 @@ cls$category_per_word <- ifelse(cls$faster & cls$R_E_word < 1, "faster and cheap
                          ifelse(cls$R_E_word < 1, "slower, cheaper", "slower and costs more")))
 write.csv(cls, file.path(DIR_STATS, "rq2_tradeoff_classification.csv"), row.names = FALSE)
 
-where <- function(g) {  # which content sizes / modalities fall in "faster and cheaper"
-  w <- unique(g[c("input_modality", "content_size")])
-  if (nrow(w) == 0) return("--")
-  paste(sprintf("%s %s", w$input_modality, w$content_size), collapse = ", ")
-}
 tt <- do.call(rbind, lapply(MODELS, function(m) {
   g <- cls[cls$model == m, ]
   data.frame(Model = MODEL_LABELS[[m]], Faster = sprintf("%d / %d", sum(g$faster), nrow(g)),
              `Faster \\& cheaper` = sum(g$category == "faster and cheaper"),
              `\\ldots{} per word` = sum(g$category_per_word == "faster and cheaper"),
              `Faster, costs more` = sum(g$category == "faster, costs more energy"),
-             `Faster \\& cheaper per word in` = where(g[g$category_per_word == "faster and cheaper" &
-                                                          g$network_condition == "standard", ]),
              check.names = FALSE)
 }))
 write_latex_table(tt, "tab_rq2_tradeoff.tex",
                   paste("Energy--performance trade-off per model: number of the 18 configurations",
                         "(modality $\\times$ size $\\times$ network) where remote inference is faster",
                         "(median $R_T < 1$), faster and cheaper in total energy ($R_E < 1$) or per word",
-                        "($R_{E,word} < 1$), or faster but more energy-intensive. Last column: the",
-                        "standard-network workloads where remote is faster and cheaper per word."),
-                  "tab:tradeoff", align = "lrrrrl", wide = TRUE)
+                        "($R_{E,word} < 1$), or faster but more energy-intensive."),
+                  "tab:tradeoff", align = "lrrrr")

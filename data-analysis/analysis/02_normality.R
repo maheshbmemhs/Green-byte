@@ -30,9 +30,9 @@ resid_of <- function(d, factors, label) {
   }))
 }
 qq <- rbind(resid_of(std, c("approach", "content_size", "input_modality"),
-                     "Local vs remote"),
+                     "RQ1.1/1.2"),
             resid_of(rem, c("content_size", "input_modality", "network_condition"),
-                     "Remote, all networks"))
+                     "RQ1.3"))
 notes <- unique(qq[c("model_label", "model_set", "note")])
 
 p <- ggplot(qq, aes(theoretical, sample)) +
@@ -44,5 +44,6 @@ p <- ggplot(qq, aes(theoretical, sample)) +
   labs(title = "Q-Q plots of model residuals (E_total)",
        subtitle = "Points should follow the line if residuals are normal; Shapiro-Wilk per panel",
        x = "Theoretical normal quantiles", y = "Residual of E_total (J)") +
-  theme_greenlab() + theme(panel.grid.major.x = element_line(colour = COL$grid, linewidth = 0.3))
-save_fig(p, "fig_normality_qq", height = 4, paper_width = 3.4, paper_height = 3.2)
+  theme_greenlab() + theme(panel.grid.major.x = element_line(colour = COL$grid, linewidth = 0.3),
+                           strip.text.x = element_text(size = 7))
+save_fig(p, "fig_normality_qq", height = 4, paper_width = 3.4, paper_height = 2.6)

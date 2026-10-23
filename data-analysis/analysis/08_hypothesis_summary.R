@@ -7,20 +7,20 @@ tests <- rbind(read_stats("rq1_anova.csv"), read_stats("rq1_3_anova.csv"), read_
 tests <- tests[!duplicated(tests[c("model", "metric", "effect")]), ]
 
 H <- data.frame(rbind(
-  c("RQ1",      "$R_E$ differs by content size",                 "R_E", "size"),
-  c("RQ1",      "$R_E$ differs by input modality",               "R_E", "modality"),
-  c("RQ1",      "$R_E$ differs by network condition",            "R_E", "network"),
-  c("RQ1.1-A",  "Energy differs between on-device and remote", "E_total (standard network)", "approach"),
-  c("RQ1.1-B",  "Energy differs across content sizes",         "E_total (standard network)", "size"),
-  c("RQ1.1-AB", "Approach effect depends on content size",     "E_total (standard network)", "approach x size"),
-  c("RQ1.2-A",  "Energy differs between on-device and remote", "E_total (standard network)", "approach"),
-  c("RQ1.2-B",  "Energy differs between text and image",       "E_total (standard network)", "modality"),
-  c("RQ1.2-AB", "Approach effect depends on input modality",   "E_total (standard network)", "approach x modality"),
-  c("RQ1.3-N",  "Remote energy differs across networks",       "Total energy", "network"),
-  c("RQ1.3-G",  "$R_E$ differs across networks",                 "R_E", "network"),
-  c("RQ2",      "$R_E$ differs across networks",                 "R_E", "network"),
-  c("RQ2",      "$R_T$ differs across networks",                 "R_T", "network"),
-  c("RQ2",      "Remote throughput differs across networks",   "Throughput", "network")),
+  c("RQ1",      "Size ($R_E$)", "R_E", "size"),
+  c("RQ1",      "Modality ($R_E$)", "R_E", "modality"),
+  c("RQ1",      "Network ($R_E$)", "R_E", "network"),
+  c("RQ1.1-A",  "Approach ($E$)", "E_total (standard network)", "approach"),
+  c("RQ1.1-B",  "Size ($E$)",         "E_total (standard network)", "size"),
+  c("RQ1.1-AB", "Approach $\\times$ size ($E$)",     "E_total (standard network)", "approach x size"),
+  c("RQ1.2-A",  "Approach ($E$)", "E_total (standard network)", "approach"),
+  c("RQ1.2-B",  "Modality ($E$)",       "E_total (standard network)", "modality"),
+  c("RQ1.2-AB", "Approach $\\times$ modality ($E$)",   "E_total (standard network)", "approach x modality"),
+  c("RQ1.3-N",  "Network ($E_{remote}$)",       "Total energy", "network"),
+  c("RQ1.3-G",  "Network ($R_E$)",                 "R_E", "network"),
+  c("RQ2",      "Network ($R_E$)",                 "R_E", "network"),
+  c("RQ2",      "Network ($R_T$)",                 "R_T", "network"),
+  c("RQ2",      "Network (throughput)",   "Throughput", "network")),
   stringsAsFactors = FALSE)
 names(H) <- c("hypothesis", "h1", "metric", "effect")
 
@@ -45,12 +45,13 @@ for (m in MODELS) {
   wide[[MODEL_LABELS[[m]]]] <- sprintf("%s%s (%.2f)", fmt_p(g$p_bh),
                                        ifelse(g$p_bh < ALPHA, "", "$^{\\dagger}$"), g$eta_sq_primary)
 }
-names(wide)[1:2] <- c("Hypothesis", "$H_1$")
+names(wide)[1:2] <- c("Hyp.", "Effect (metric)")
 write_latex_table(wide, "tab_hypothesis_summary.tex",
-                  paste("Hypothesis tests per model (ART ANOVA). Cells: $p$ after Benjamini--Hochberg",
-                        "correction within each research question ($\\eta^2_p$). $H_0$ is rejected when",
-                        "$p < 0.05$; $\\dagger$ = fail to reject $H_0$."),
-                  "tab:hypotheses", align = "ll rrr", wide = TRUE, group = "Hypothesis")
+                  paste("Hypothesis tests per model (ART ANOVA): effect tested and its metric ($E$ = total",
+                        "energy on the standard network). Cells: $p$ after Benjamini--Hochberg correction",
+                        "within each research question ($\\eta^2_p$). $H_0$ is rejected when $p < 0.05$;",
+                        "$\\dagger$ = fail to reject $H_0$."),
+                  "tab:hypotheses", align = "ll rrr", group = "Hyp.")
 
 net <- rbind(read_stats("rq1_3_network_summary.csv"), read_stats("rq2_network_summary.csv"))
 net <- net[net$metric %in% c("Total energy", "Client (laptop) energy", "Execution time", "Throughput"), ]
@@ -68,11 +69,13 @@ for (m in unique(net$model)) {
   net$p[i] <- adj[1:k]; net$p_size_net[i] <- adj[(k + 1):(2 * k)]; net$p_mod_net[i] <- adj[(2 * k + 1):(3 * k)]
 }
 write.csv(net, file.path(DIR_STATS, "network_effects_bh.csv"), row.names = FALSE)
-tab <- data.frame(Model = MODEL_LABELS[net$model], Metric = as.character(net$metric),
+short_metric <- c("Total energy" = "Energy", "Client (laptop) energy" = "Laptop energy",
+                  "Execution time" = "Time", "Throughput" = "Throughput")
+tab <- data.frame(Model = MODEL_LABELS[net$model], Metric = short_metric[as.character(net$metric)],
                   `$p$` = fmt_p(net$p), `$\\eta^2_p$` = sprintf("%.2f", net$eta_sq),
                   Ratio = sprintf("%.2f", net$ratio_bad_vs_standard),
                   `$\\delta$` = sprintf("%+.2f", net$cliffs_delta_bad_vs_standard),
-                  Cells = net$cells_significant_bad_vs_standard,
+                  Cells = sub(" of ", "/", net$cells_significant_bad_vs_standard),
                   `Size$\\times$net.` = fmt_p(net$p_size_net),
                   `Mod.$\\times$net.` = fmt_p(net$p_mod_net), check.names = FALSE)
 write_latex_table(tab, "tab_network_effects.tex",
@@ -82,4 +85,4 @@ write_latex_table(tab, "tab_network_effects.tex",
                         "standard after Benjamini--Hochberg. The last two columns give $p$ for the",
                         "interaction of network with content size and with input modality. All $p$-values",
                         "in this table are Benjamini--Hochberg corrected over the table, per model."),
-                  "tab:network", align = "llrrrrrrr", wide = TRUE, group = "Model")
+                  "tab:network", align = "llrrrrrrr", group = "Model")

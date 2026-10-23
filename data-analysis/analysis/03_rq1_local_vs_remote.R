@@ -85,13 +85,16 @@ box_fig <- function(d, y, ylab, title) {
     scale_x_discrete(labels = SIZE_LABELS) +
     scale_y_continuous(labels = scales::label_comma(), limits = c(0, NA)) +
     facet_grid(model_label ~ input_modality, scales = "free_y",
-               labeller = labeller(input_modality = c(text = "Text input", image = "Image input"))) +
+               labeller = labeller(input_modality = c(text = "Text input", image = "Image input"),
+                                   model_label = function(x) sub("^(Qwen2.5-|Gemma) ?", "\\1\n", x))) +
     labs(title = title, x = "Requested content size (words)", y = ylab, caption = cap) +
-    theme_greenlab()
+    theme_greenlab() + theme(strip.text.y = element_text(angle = 0, hjust = 0))
 }
 save_fig(box_fig(std, "e_total_j", "Total energy E_total (J)",
                  "Total energy per run: on-device vs remote (standard network)"),
-         "fig_rq1_energy_local_vs_remote", height = 6)
+         "fig_rq1_energy_local_vs_remote", height = 6, paper_width = 3.4, paper_height = 3.3,
+         paper_extra = list(scale_x_discrete(labels = c(short = "Short", medium = "Medium", long = "Long")),
+                            labs(x = "Requested content size")))
 save_fig(box_fig(std, "e_per_word_j", "Energy per word E_word (J/word)",
                  "Energy per output word: on-device vs remote (standard network)"),
          "fig_rq1_energy_per_word", height = 6)
@@ -122,7 +125,11 @@ ratio_heatmap <- function(var, title, name) {
     theme(panel.grid = element_blank(), panel.grid.major.y = element_blank(), axis.line = element_blank(),
           axis.ticks = element_blank(), legend.position = "right",
           legend.title = element_text(size = 7, colour = COL$ink2))
-  save_fig(p, name, height = 2.9)
+  short_rows <- function(x) sub("Qwen2.5-VL-", "Qwen ", sub("Gemma 3 4B", "Gemma", x))
+  save_fig(p, name, height = 2.9, paper_width = 3.4, paper_height = 1.55,
+           paper_extra = list(scale_y_discrete(labels = short_rows), theme(legend.position = "none",
+                              axis.text = element_text(size = 6), strip.text = element_text(size = 7),
+                              plot.margin = margin(2, 4, 2, 2))))
 }
 ratio_heatmap("R_E", "Relative energy R_E = E_remote / E_on-device", "fig_rq1_relative_energy_heatmap")
 ratio_heatmap("R_E_word", "Relative energy per output word = E_word,remote / E_word,on-device",

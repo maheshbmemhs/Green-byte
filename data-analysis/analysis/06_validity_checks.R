@@ -27,7 +27,12 @@ p <- ggplot(w, aes(x, output_words)) +
        subtitle = "Black ring = output cut off at max_tokens", x = "Requested content size (words)",
        y = "Output length (words)") +
   theme_greenlab()
-save_fig(p, "fig_validity_word_target", height = 3)
+save_fig(p, "fig_validity_word_target", height = 3, paper_width = 3.4, paper_height = 2.3,
+         paper_extra = list(scale_x_continuous(breaks = 1:3, labels = c("Short", "Med.", "Long")),
+                            guides(colour = guide_legend(nrow = 2), shape = guide_legend(nrow = 2)),
+                            labs(x = "Requested content size"),
+                            theme(axis.text = element_text(size = 6), strip.text = element_text(size = 7),
+                                  legend.text = element_text(size = 6.5))))
 
 r <- runs[runs$flag_rapl_corrected & runs$approach == "local", ][1, ]
 eb <- read.csv(file.path(r$raw_run_dir, "energibridge.csv"), check.names = FALSE)

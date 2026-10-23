@@ -27,9 +27,9 @@ desc <- desc[order(desc$approach, desc$model, desc$input_modality, desc$content_
 write.csv(desc, file.path(DIR_STATS, "descriptives.csv"), row.names = FALSE)
 message("  stats:  ", file.path(DIR_STATS, "descriptives.csv"))
 
-msd <- function(m, s, digits = 0) {
-  f <- function(x) formatC(x, format = "f", digits = digits, big.mark = "{,}")
-  sprintf("%s (%s)", f(m), f(s))
+msd <- function(m, s, digits = 0, sd_digits = digits) {
+  f <- function(x, d) formatC(x, format = "f", digits = d, big.mark = "{,}")
+  sprintf("%s (%s)", f(m, digits), f(s, sd_digits))
 }
 
 rem <- desc[desc$approach == "remote", ]
@@ -71,22 +71,61 @@ for (m in MODELS) for (mod in MODALITIES) for (s in SIZES) {
   g <- desc[desc$model == m & desc$input_modality == mod & desc$content_size == s, ]
   l <- g[g$approach == "local", ]
   r <- g[g$approach == "remote", ][match(NETWORKS, g$network_condition[g$approach == "remote"]), ]
-  f1 <- function(x) formatC(x, format = "f", digits = 1)
   cmp_rows[[length(cmp_rows) + 1]] <- data.frame(
     Model = MODEL_LABELS[[m]], Input = mod, Size = s,
     `E on-dev.` = msd(l$e_total_j_mean, l$e_total_j_sd),
     `E std.` = msd(r$e_total_j_mean[1], r$e_total_j_sd[1]),
     `E degr.` = msd(r$e_total_j_mean[2], r$e_total_j_sd[2]),
     `E bad` = msd(r$e_total_j_mean[3], r$e_total_j_sd[3]),
-    `T on-dev.` = f1(l$duration_s_mean), `T std.` = f1(r$duration_s_mean[1]),
-    `T degr.` = f1(r$duration_s_mean[2]), `T bad` = f1(r$duration_s_mean[3]), check.names = FALSE)
+    `T on-dev.` = msd(l$duration_s_mean, l$duration_s_sd, 1, 2),
+    `T std.` = msd(r$duration_s_mean[1], r$duration_s_sd[1], 1, 2),
+    `T degr.` = msd(r$duration_s_mean[2], r$duration_s_sd[2], 1, 2),
+    `T bad` = msd(r$duration_s_mean[3], r$duration_s_sd[3], 1, 2), check.names = FALSE)
 }
 tab <- do.call(rbind, cmp_rows)
 names(tab) <- c("Model", "Input", "Size", "On-device", "Std.", "Degr.", "Bad",
                 "On-device", "Std.", "Degr.", "Bad")
 write_latex_table(tab, "tab_descriptives_compact.tex",
-                  paste("Mean (SD) total energy $E_{total}$ in J (left) and mean execution time $T$ in s",
+                  paste("Mean (SD) of the total energy $E_{total}$ in J (left) and of the execution time $T$ in s",
                         "(right) per treatment, 30 runs each. Remote columns: standard, degraded and bad",
-                        "network; remote energy is laptop + server."),
+                        "network; remote energy is laptop + server. Median, variance, minimum and maximum",
+                        "are in the replication package."),
                   "tab:descriptives", align = "lll rrrr rrrr", wide = TRUE, group = "Model",
                   header_above = "\\multicolumn{3}{c}{} & \\multicolumn{4}{c}{$E_{total}$ (J)} & \\multicolumn{4}{c}{$T$ (s)} \\\\ \\cmidrule(lr){4-7} \\cmidrule(lr){8-11}")
+
+stats_table <- function(metric, unit, digits, file, label, what) {
+  f <- function(x, d = digits) formatC(x, format = "f", digits = d, big.mark = "{,}")
+  d <- desc
+  d$setting <- ifelse(d$approach == "local", "On-device", paste("Remote,", d$network_condition))
+  d$setting <- factor(d$setting, levels = c("On-device", paste("Remote,", NETWORKS)))
+  d$model <- factor(d$model, levels = MODELS)
+  d$input_modality <- factor(d$input_modality, levels = MODALITIES)
+  d$content_size <- factor(d$content_size, levels = SIZES)
+  d <- d[order(d$model, d$input_modality, d$content_size, d$setting), ]
+  v <- function(s) d[[paste0(metric, "_", s)]]
+  tab <- data.frame(Model = MODEL_LABELS[as.character(d$model)], Input = d$input_modality,
+                    Size = d$content_size, Setting = d$setting,
+                    Mean = f(v("mean")), Median = f(v("median")), SD = f(v("sd")),
+                    Variance = f(v("var"), if (digits == 0) 0 else digits + 1),
+                    Min = f(v("min")), Max = f(v("max")), check.names = FALSE)
+  write_latex_table(tab, file,
+                    sprintf("Summary statistics of %s per treatment (30 runs each).%s", what, if (metric == "e_total_j") " Remote energy is laptop + server." else ""),
+                    label, align = "llll rrrrrr", wide = TRUE, group = "Model")
+}
+stats_table("e_total_j", "J", 0, "tab_stats_energy.tex", "tab:stats-energy", "the total energy $E_{total}$ (J)")
+stats_table("duration_s", "s", 2, "tab_stats_time.tex", "tab:stats-time", "the execution time $T$ (s)")
+
+# Anomaly check: zero/negative values and outliers per treatment (1.5 and 3 x IQR)
+k <- c("approach", "model", "input_modality", "content_size", "network_condition")
+flag <- function(v, m) { q <- quantile(v, c(.25, .75)); i <- q[2] - q[1]; as.numeric(v < q[1] - m * i | v > q[2] + m * i) }
+anom <- do.call(rbind, lapply(c("e_total_j", "duration_s", "output_words"), function(m) {
+  o15 <- ave(runs[[m]], runs[k], FUN = function(v) flag(v, 1.5))
+  o3 <- ave(runs[[m]], runs[k], FUN = function(v) flag(v, 3))
+  do.call(rbind, lapply(c("local", "remote"), function(a) {
+    s <- runs$approach == a
+    data.frame(metric = m, approach = a, runs = sum(s), zero_or_negative = sum(runs[[m]][s] <= 0),
+               missing = sum(is.na(runs[[m]][s])), outliers_1_5_iqr = sum(o15[s]), outliers_3_iqr = sum(o3[s]))
+  }))
+}))
+write.csv(anom, file.path(DIR_STATS, "anomaly_check.csv"), row.names = FALSE)
+message("  stats:  ", file.path(DIR_STATS, "anomaly_check.csv"))
