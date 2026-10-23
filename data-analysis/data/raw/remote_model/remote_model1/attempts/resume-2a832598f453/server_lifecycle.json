@@ -1,0 +1,64 @@
+[
+  {
+    "op": "init",
+    "time": 1792165943.5851243,
+    "result": {
+      "root": "/home/gl_greenbyte/logs/greenlab-remote/resume-2a832598f453",
+      "agent": {
+        "pid": 1233475,
+        "start_ticks": "165979295",
+        "ppid": 1233474
+      }
+    }
+  },
+  {
+    "op": "legacy",
+    "time": 1792165943.6166348,
+    "result": []
+  },
+  {
+    "op": "start_requested",
+    "model": "qwen7b",
+    "tmux_session": "greenlab-resume-2a832598f453-qwen7b",
+    "remote_directory": "logs/greenlab-remote/resume-2a832598f453/qwen7b",
+    "time": 1792165943.6171384
+  },
+  {
+    "op": "start",
+    "time": 1792165943.7851887,
+    "result": {
+      "model": "qwen7b",
+      "tmux_session": "greenlab-resume-2a832598f453-qwen7b",
+      "command": [
+        "/home/gl_greenbyte/llama.cpp/build-cuda/bin/llama-server",
+        "-hf",
+        "ggml-org/Qwen2.5-VL-7B-Instruct-GGUF",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8082",
+        "-ngl",
+        "20",
+        "-c",
+        "8192",
+        "--no-context-shift",
+        "-np",
+        "1"
+      ],
+      "log": "/home/gl_greenbyte/logs/greenlab-remote/resume-2a832598f453/qwen7b/server.log",
+      "identity_file": "/home/gl_greenbyte/logs/greenlab-remote/resume-2a832598f453/qwen7b/process.json",
+      "starting_at": 1792165943.5802584,
+      "tmux_id": "$0",
+      "process": {
+        "pid": 1233482,
+        "start_ticks": "165979308"
+      }
+    }
+  },
+  {
+    "op": "stop",
+    "time": 1792165949.0585332,
+    "error": "[Errno 32] Broken pipe",
+    "shutdown_confirmed": false
+  }
+]

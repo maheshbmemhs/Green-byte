@@ -1,0 +1,240 @@
+[
+  {
+    "op": "init",
+    "time": 1792107486.8518915,
+    "result": {
+      "root": "/home/gl_greenbyte/logs/greenlab-remote/20261015T233805Z-a6af98c0",
+      "agent": {
+        "pid": 1004558,
+        "start_ticks": "160133631",
+        "ppid": 1004557
+      }
+    }
+  },
+  {
+    "op": "legacy",
+    "time": 1792107486.8661005,
+    "result": []
+  },
+  {
+    "op": "start_requested",
+    "model": "gemma4b",
+    "tmux_session": "greenlab-20261015T233805Z-a6af98c0-gemma4b",
+    "remote_directory": "logs/greenlab-remote/20261015T233805Z-a6af98c0/gemma4b",
+    "time": 1792107486.8664339
+  },
+  {
+    "op": "start",
+    "time": 1792107486.9280512,
+    "result": {
+      "model": "gemma4b",
+      "tmux_session": "greenlab-20261015T233805Z-a6af98c0-gemma4b",
+      "command": [
+        "/home/gl_greenbyte/llama.cpp/build-cuda/bin/llama-server",
+        "-hf",
+        "ggml-org/gemma-3-4b-it-GGUF",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8083",
+        "-ngl",
+        "999",
+        "-c",
+        "8192",
+        "--no-context-shift",
+        "-np",
+        "1"
+      ],
+      "log": "/home/gl_greenbyte/logs/greenlab-remote/20261015T233805Z-a6af98c0/gemma4b/server.log",
+      "identity_file": "/home/gl_greenbyte/logs/greenlab-remote/20261015T233805Z-a6af98c0/gemma4b/process.json",
+      "starting_at": 1792107486.8778558,
+      "tmux_id": "$0",
+      "process": {
+        "pid": 1004565,
+        "start_ticks": "160133638"
+      }
+    }
+  },
+  {
+    "op": "stop",
+    "time": 1792120274.893391,
+    "result": {
+      "model": "gemma4b",
+      "tmux_session": "greenlab-20261015T233805Z-a6af98c0-gemma4b",
+      "command": [
+        "/home/gl_greenbyte/llama.cpp/build-cuda/bin/llama-server",
+        "-hf",
+        "ggml-org/gemma-3-4b-it-GGUF",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8083",
+        "-ngl",
+        "999",
+        "-c",
+        "8192",
+        "--no-context-shift",
+        "-np",
+        "1"
+      ],
+      "log": "/home/gl_greenbyte/logs/greenlab-remote/20261015T233805Z-a6af98c0/gemma4b/server.log",
+      "identity_file": "/home/gl_greenbyte/logs/greenlab-remote/20261015T233805Z-a6af98c0/gemma4b/process.json",
+      "starting_at": 1792107486.8778558,
+      "tmux_id": "$0",
+      "process": {
+        "pid": 1004565,
+        "start_ticks": "160133638"
+      },
+      "stopped_at": 1792120274.8779805
+    }
+  },
+  {
+    "op": "start_requested",
+    "model": "qwen3b",
+    "tmux_session": "greenlab-20261015T233805Z-a6af98c0-qwen3b",
+    "remote_directory": "logs/greenlab-remote/20261015T233805Z-a6af98c0/qwen3b",
+    "time": 1792120276.3110588
+  },
+  {
+    "op": "start",
+    "time": 1792120276.4604754,
+    "result": {
+      "model": "qwen3b",
+      "tmux_session": "greenlab-20261015T233805Z-a6af98c0-qwen3b",
+      "command": [
+        "/home/gl_greenbyte/llama.cpp/build-cuda/bin/llama-server",
+        "-hf",
+        "ggml-org/Qwen2.5-VL-3B-Instruct-GGUF",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8081",
+        "-ngl",
+        "999",
+        "-c",
+        "8192",
+        "--no-context-shift",
+        "-np",
+        "1"
+      ],
+      "log": "/home/gl_greenbyte/logs/greenlab-remote/20261015T233805Z-a6af98c0/qwen3b/server.log",
+      "identity_file": "/home/gl_greenbyte/logs/greenlab-remote/20261015T233805Z-a6af98c0/qwen3b/process.json",
+      "starting_at": 1792120276.303849,
+      "tmux_id": "$0",
+      "process": {
+        "pid": 1080841,
+        "start_ticks": "161412580"
+      }
+    }
+  },
+  {
+    "op": "stop",
+    "time": 1792132093.4335835,
+    "result": {
+      "model": "qwen3b",
+      "tmux_session": "greenlab-20261015T233805Z-a6af98c0-qwen3b",
+      "command": [
+        "/home/gl_greenbyte/llama.cpp/build-cuda/bin/llama-server",
+        "-hf",
+        "ggml-org/Qwen2.5-VL-3B-Instruct-GGUF",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8081",
+        "-ngl",
+        "999",
+        "-c",
+        "8192",
+        "--no-context-shift",
+        "-np",
+        "1"
+      ],
+      "log": "/home/gl_greenbyte/logs/greenlab-remote/20261015T233805Z-a6af98c0/qwen3b/server.log",
+      "identity_file": "/home/gl_greenbyte/logs/greenlab-remote/20261015T233805Z-a6af98c0/qwen3b/process.json",
+      "starting_at": 1792120276.303849,
+      "tmux_id": "$0",
+      "process": {
+        "pid": 1080841,
+        "start_ticks": "161412580"
+      },
+      "stopped_at": 1792132093.3859916
+    }
+  },
+  {
+    "op": "start_requested",
+    "model": "qwen7b",
+    "tmux_session": "greenlab-20261015T233805Z-a6af98c0-qwen7b",
+    "remote_directory": "logs/greenlab-remote/20261015T233805Z-a6af98c0/qwen7b",
+    "time": 1792132095.4533145
+  },
+  {
+    "op": "start",
+    "time": 1792132095.5940013,
+    "result": {
+      "model": "qwen7b",
+      "tmux_session": "greenlab-20261015T233805Z-a6af98c0-qwen7b",
+      "command": [
+        "/home/gl_greenbyte/llama.cpp/build-cuda/bin/llama-server",
+        "-hf",
+        "ggml-org/Qwen2.5-VL-7B-Instruct-GGUF",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8082",
+        "-ngl",
+        "20",
+        "-c",
+        "8192",
+        "--no-context-shift",
+        "-np",
+        "1"
+      ],
+      "log": "/home/gl_greenbyte/logs/greenlab-remote/20261015T233805Z-a6af98c0/qwen7b/server.log",
+      "identity_file": "/home/gl_greenbyte/logs/greenlab-remote/20261015T233805Z-a6af98c0/qwen7b/process.json",
+      "starting_at": 1792132095.419917,
+      "tmux_id": "$0",
+      "process": {
+        "pid": 1157368,
+        "start_ticks": "162594492"
+      }
+    }
+  },
+  {
+    "op": "stop",
+    "time": 1792141111.6333334,
+    "result": {
+      "model": "qwen7b",
+      "tmux_session": "greenlab-20261015T233805Z-a6af98c0-qwen7b",
+      "command": [
+        "/home/gl_greenbyte/llama.cpp/build-cuda/bin/llama-server",
+        "-hf",
+        "ggml-org/Qwen2.5-VL-7B-Instruct-GGUF",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8082",
+        "-ngl",
+        "20",
+        "-c",
+        "8192",
+        "--no-context-shift",
+        "-np",
+        "1"
+      ],
+      "log": "/home/gl_greenbyte/logs/greenlab-remote/20261015T233805Z-a6af98c0/qwen7b/server.log",
+      "identity_file": "/home/gl_greenbyte/logs/greenlab-remote/20261015T233805Z-a6af98c0/qwen7b/process.json",
+      "starting_at": 1792132095.419917,
+      "tmux_id": "$0",
+      "process": {
+        "pid": 1157368,
+        "start_ticks": "162594492"
+      },
+      "stopped_at": 1792141111.58461
+    }
+  },
+  {
+    "op": "close",
+    "time": 1792141121.6817205,
+    "result": null
+  }
+]

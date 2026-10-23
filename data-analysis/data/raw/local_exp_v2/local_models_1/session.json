@@ -1,0 +1,51 @@
+{
+  "session": "20261017T001153Z-196361c9",
+  "models": {
+    "gemma4b": "ggml-org/gemma-3-4b-it-GGUF",
+    "qwen3b": "ggml-org/Qwen2.5-VL-3B-Instruct-GGUF:Q4_K_M",
+    "qwen7b": "ggml-org/Qwen2.5-VL-7B-Instruct-GGUF:Q4_K_M"
+  },
+  "model_order": [
+    "gemma4b",
+    "qwen3b",
+    "qwen7b"
+  ],
+  "max_tokens": [
+    2100,
+    1100,
+    300
+  ],
+  "word_targets": {
+    "2100": 1000,
+    "1100": 500,
+    "300": 100
+  },
+  "warmup_repetitions": 10,
+  "main_repetitions": 30,
+  "warmup_shuffle": false,
+  "main_shuffle": true,
+  "warmup_delay_s": 0,
+  "main_delay_s": 10,
+  "stabilization_s": 10,
+  "prompts": {
+    "text": "Describe photosynthesis using the following fields:\n1. Title: A concise title.\n2. Main text: Exactly {word_count} words or slightly more explaining photosynthesis.\nCount only the main text toward the word target.",
+    "image": "Describe and explain the photosynthesis shown in this image.\n\n1. Title: A concise title.\n2. Main text: Aim for {word_count} words, up to 10% more.\n\nDescribe the visible elements, then explain their roles in photosynthesis, the inputs and outputs, the stages of the process, and its biological importance. Scale the level of detail to the requested word target. Clearly distinguish what is visible in the image from additional scientific explanation.\n\nCount only the main text toward the word target."
+  },
+  "prompt_types": [
+    "text",
+    "image"
+  ],
+  "image": {
+    "original_filename": "photosynthesis.png",
+    "sha256": "d8724d87f0d02a19853ce26dcfb0afd20937edeac8362259d4facc800ab8ad0d",
+    "width": 780,
+    "height": 575,
+    "format": "PNG",
+    "session_path": "inputs/photosynthesis.png"
+  },
+  "context_size": 8192,
+  "cache_prompt": false,
+  "energibridge": "/usr/local/bin/energibridge",
+  "status": "failed",
+  "error": "Incomplete or incorrect run in /home/mahesh/GreenLab/results/20261017T001153Z-196361c9/gemma4b/main: run_0_repetition_24"
+}

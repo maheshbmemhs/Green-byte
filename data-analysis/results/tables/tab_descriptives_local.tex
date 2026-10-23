@@ -1,0 +1,33 @@
+\begin{table*}[tp]
+\centering
+\small
+\caption{On-device inference: mean (SD) per treatment, 30 runs each.}
+\label{tab:descriptives-local}
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{%
+\begin{tabular}{lll rrrr}
+\toprule
+Model & Input & Size & $E_{total}$ (J) & $E_{word}$ (J/word) & $T$ (s) & $\Theta$ (B/s) \\
+\midrule
+Qwen2.5-VL-3B & text & short & 368 (19) & 3.18 (0.16) & 7.9 (0.2) & 92 (2) \\
+ & text & medium & 1{,}385 (23) & 3.20 (0.05) & 28.1 (0.1) & 102 (0) \\
+ & text & long & 2{,}783 (20) & 3.67 (0.03) & 56.3 (0.1) & 90 (0) \\
+ & image & short & 549 (22) & 3.59 (0.14) & 11.4 (0.0) & 86 (0) \\
+ & image & medium & 2{,}239 (32) & 3.41 (0.05) & 45.4 (0.2) & 95 (1) \\
+ & image & long & 1{,}994 (31) & 3.41 (0.05) & 40.5 (0.1) & 95 (0) \\
+\midrule
+Gemma 3 4B & text & short & 497 (8) & 3.82 (0.06) & 10.7 (0.0) & 82 (0) \\
+ & text & medium & 2{,}122 (25) & 3.88 (0.05) & 43.1 (0.1) & 90 (0) \\
+ & text & long & 4{,}195 (27) & 4.10 (0.03) & 85.0 (0.2) & 84 (0) \\
+ & image & short & 798 (14) & 5.35 (0.10) & 17.3 (0.1) & 58 (0) \\
+ & image & medium & 2{,}099 (21) & 4.22 (0.04) & 43.2 (0.1) & 80 (0) \\
+ & image & long & 3{,}806 (27) & 4.16 (0.03) & 77.7 (0.2) & 83 (0) \\
+\midrule
+Qwen2.5-VL-7B & text & short & 517 (8) & 5.74 (0.09) & 10.3 (0.1) & 53 (0) \\
+ & text & medium & 3{,}603 (50) & 6.10 (0.08) & 79.0 (1.9) & 52 (1) \\
+ & text & long & 5{,}835 (61) & 5.57 (0.06) & 128.9 (1.8) & 52 (1) \\
+ & image & short & 855 (13) & 7.31 (0.12) & 17.6 (0.4) & 40 (1) \\
+ & image & medium & 4{,}963 (75) & 6.06 (0.09) & 110.3 (2.5) & 48 (1) \\
+ & image & long & 5{,}102 (62) & 6.28 (0.08) & 113.5 (2.1) & 46 (1) \\
+\bottomrule
+\end{tabular}}
+\end{table*}

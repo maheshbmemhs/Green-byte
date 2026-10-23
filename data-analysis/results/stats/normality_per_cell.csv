@@ -1,0 +1,217 @@
+"approach","model","input_modality","content_size","network_condition","metric","n","W","p","normal"
+"remote","qwen3b","text","short","standard","e_total_j",30,0.912128399487723,0.0168445340614496,FALSE
+"remote","qwen3b","text","short","standard","duration_s",30,0.721609716499691,3.26972713681364e-06,FALSE
+"remote","qwen3b","text","short","standard","throughput_bytes_per_s",30,0.766348081702557,1.69235908071849e-05,FALSE
+"remote","gemma4b","text","short","standard","e_total_j",30,0.855907427894597,0.000826406089642808,FALSE
+"remote","gemma4b","text","short","standard","duration_s",30,0.701797090494104,1.65719690026462e-06,FALSE
+"remote","gemma4b","text","short","standard","throughput_bytes_per_s",30,0.716012372878992,2.69105635546838e-06,FALSE
+"remote","qwen7b","text","short","standard","e_total_j",30,0.749868010495659,9.06187208481521e-06,FALSE
+"remote","qwen7b","text","short","standard","duration_s",30,0.849932657269585,0.000618021506241838,FALSE
+"remote","qwen7b","text","short","standard","throughput_bytes_per_s",30,0.855298131032393,0.000802085926870425,FALSE
+"remote","qwen3b","image","short","standard","e_total_j",30,0.851097716863688,0.00065378255240576,FALSE
+"remote","qwen3b","image","short","standard","duration_s",30,0.883966709086883,0.00348159919372338,FALSE
+"remote","qwen3b","image","short","standard","throughput_bytes_per_s",30,0.934234573952062,0.0636811171660376,TRUE
+"remote","gemma4b","image","short","standard","e_total_j",30,0.919212136817311,0.0255890993116861,FALSE
+"remote","gemma4b","image","short","standard","duration_s",30,0.88681521931858,0.00405800357672333,FALSE
+"remote","gemma4b","image","short","standard","throughput_bytes_per_s",30,0.925074785663684,0.03638993245572,FALSE
+"remote","qwen7b","image","short","standard","e_total_j",30,0.843040572952553,0.000444833154488931,FALSE
+"remote","qwen7b","image","short","standard","duration_s",30,0.872101150504119,0.00186630661442943,FALSE
+"remote","qwen7b","image","short","standard","throughput_bytes_per_s",30,0.880331366580134,0.00286902179464131,FALSE
+"remote","qwen3b","text","medium","standard","e_total_j",30,0.939169597679889,0.0863946967042616,TRUE
+"remote","qwen3b","text","medium","standard","duration_s",30,0.629383409507307,1.69991356111632e-07,FALSE
+"remote","qwen3b","text","medium","standard","throughput_bytes_per_s",30,0.685065391714647,9.52797949422855e-07,FALSE
+"remote","gemma4b","text","medium","standard","e_total_j",30,0.888184218653711,0.00437021685251329,FALSE
+"remote","gemma4b","text","medium","standard","duration_s",30,0.881828894733504,0.00310626098513183,FALSE
+"remote","gemma4b","text","medium","standard","throughput_bytes_per_s",30,0.887970699090852,0.00431989411635327,FALSE
+"remote","qwen7b","text","medium","standard","e_total_j",30,0.949754479848258,0.166518652645499,TRUE
+"remote","qwen7b","text","medium","standard","duration_s",30,0.912606242900114,0.0173218409717228,FALSE
+"remote","qwen7b","text","medium","standard","throughput_bytes_per_s",30,0.913171215627438,0.0179045554814878,FALSE
+"remote","qwen3b","image","medium","standard","e_total_j",30,0.967293296141105,0.46801558638425,TRUE
+"remote","qwen3b","image","medium","standard","duration_s",30,0.843804872011021,0.00046120214651299,FALSE
+"remote","qwen3b","image","medium","standard","throughput_bytes_per_s",30,0.882083081602682,0.00314855164810497,FALSE
+"remote","gemma4b","image","medium","standard","e_total_j",30,0.923329154138589,0.0327499860596643,FALSE
+"remote","gemma4b","image","medium","standard","duration_s",30,0.801406418378454,6.95525381626122e-05,FALSE
+"remote","gemma4b","image","medium","standard","throughput_bytes_per_s",30,0.838500124950938,0.000359484268437506,FALSE
+"remote","qwen7b","image","medium","standard","e_total_j",30,0.984533807060845,0.928988689216107,TRUE
+"remote","qwen7b","image","medium","standard","duration_s",30,0.901739326725309,0.00926546581544844,FALSE
+"remote","qwen7b","image","medium","standard","throughput_bytes_per_s",30,0.90607878887534,0.0118659726251272,FALSE
+"remote","qwen3b","text","long","standard","e_total_j",30,0.940625840464639,0.0945588631457179,TRUE
+"remote","qwen3b","text","long","standard","duration_s",30,0.833214066047522,0.000281504126613292,FALSE
+"remote","qwen3b","text","long","standard","throughput_bytes_per_s",30,0.842236454968985,0.000428275392406466,FALSE
+"remote","gemma4b","text","long","standard","e_total_j",30,0.838231663124566,0.000355015778775759,FALSE
+"remote","gemma4b","text","long","standard","duration_s",30,0.741145216571367,6.57144878361213e-06,FALSE
+"remote","gemma4b","text","long","standard","throughput_bytes_per_s",30,0.755568023919456,1.12173892752678e-05,FALSE
+"remote","qwen7b","text","long","standard","e_total_j",30,0.944544044444627,0.120592352711951,TRUE
+"remote","qwen7b","text","long","standard","duration_s",30,0.92676574876682,0.0403179341376158,FALSE
+"remote","qwen7b","text","long","standard","throughput_bytes_per_s",30,0.927267055451682,0.0415650966219248,FALSE
+"remote","qwen3b","image","long","standard","e_total_j",30,0.902760253201985,0.00981779949958734,FALSE
+"remote","qwen3b","image","long","standard","duration_s",30,0.880529732246286,0.00289931199800738,FALSE
+"remote","qwen3b","image","long","standard","throughput_bytes_per_s",30,0.905332836029249,0.0113692821431813,FALSE
+"remote","gemma4b","image","long","standard","e_total_j",30,0.886652149499588,0.00402241907615655,FALSE
+"remote","gemma4b","image","long","standard","duration_s",30,0.928844115751283,0.0457556832482632,FALSE
+"remote","gemma4b","image","long","standard","throughput_bytes_per_s",30,0.934978242603552,0.066668478883832,TRUE
+"remote","qwen7b","image","long","standard","e_total_j",30,0.942604893292831,0.106915868127011,TRUE
+"remote","qwen7b","image","long","standard","duration_s",30,0.809239885360594,9.70625377529244e-05,FALSE
+"remote","qwen7b","image","long","standard","throughput_bytes_per_s",30,0.812859940255603,0.000113489906452494,FALSE
+"remote","qwen3b","text","short","degraded","e_total_j",30,0.813745378197513,0.000117941500466441,FALSE
+"remote","qwen3b","text","short","degraded","duration_s",30,0.829394069922302,0.000236445417111454,FALSE
+"remote","qwen3b","text","short","degraded","throughput_bytes_per_s",30,0.833396626904102,0.000283874035812929,FALSE
+"remote","gemma4b","text","short","degraded","e_total_j",30,0.95513777969179,0.231568938149222,TRUE
+"remote","gemma4b","text","short","degraded","duration_s",30,0.876920771216242,0.00239749381606048,FALSE
+"remote","gemma4b","text","short","degraded","throughput_bytes_per_s",30,0.87356599562867,0.00201311940970101,FALSE
+"remote","qwen7b","text","short","degraded","e_total_j",30,0.89320114675648,0.0057500482372882,FALSE
+"remote","qwen7b","text","short","degraded","duration_s",30,0.745342289576855,7.66433594955667e-06,FALSE
+"remote","qwen7b","text","short","degraded","throughput_bytes_per_s",30,0.75544898458145,1.11671963051055e-05,FALSE
+"remote","qwen3b","image","short","degraded","e_total_j",30,0.983609557240839,0.911216874475221,TRUE
+"remote","qwen3b","image","short","degraded","duration_s",30,0.859130260322854,0.00096874768195964,FALSE
+"remote","qwen3b","image","short","degraded","throughput_bytes_per_s",30,0.922857850917266,0.0318336969046255,FALSE
+"remote","gemma4b","image","short","degraded","e_total_j",30,0.967502600042747,0.47329704949872,TRUE
+"remote","gemma4b","image","short","degraded","duration_s",30,0.67553036226241,7.00508018734502e-07,FALSE
+"remote","gemma4b","image","short","degraded","throughput_bytes_per_s",30,0.865464490106614,0.00133000306198385,FALSE
+"remote","qwen7b","image","short","degraded","e_total_j",30,0.664868699064955,4.99817935231632e-07,FALSE
+"remote","qwen7b","image","short","degraded","duration_s",30,0.391731640717855,4.55525782491086e-10,FALSE
+"remote","qwen7b","image","short","degraded","throughput_bytes_per_s",30,0.467892834323077,2.49266874720418e-09,FALSE
+"remote","qwen3b","text","medium","degraded","e_total_j",30,0.870128620047852,0.00168630360887343,FALSE
+"remote","qwen3b","text","medium","degraded","duration_s",30,0.826716410203921,0.000209466253807683,FALSE
+"remote","qwen3b","text","medium","degraded","throughput_bytes_per_s",30,0.829171190006738,0.000234064825498305,FALSE
+"remote","gemma4b","text","medium","degraded","e_total_j",30,0.870389307418634,0.00170899768173582,FALSE
+"remote","gemma4b","text","medium","degraded","duration_s",30,0.845511301451404,0.000500101745820954,FALSE
+"remote","gemma4b","text","medium","degraded","throughput_bytes_per_s",30,0.850844240393053,0.000645819329861482,FALSE
+"remote","qwen7b","text","medium","degraded","e_total_j",30,0.964560456655385,0.402767818056774,TRUE
+"remote","qwen7b","text","medium","degraded","duration_s",30,0.792541989537261,4.80867857726704e-05,FALSE
+"remote","qwen7b","text","medium","degraded","throughput_bytes_per_s",30,0.795395738744296,5.41043297303074e-05,FALSE
+"remote","qwen3b","image","medium","degraded","e_total_j",30,0.980788432496626,0.84611306206447,TRUE
+"remote","qwen3b","image","medium","degraded","duration_s",30,0.766314148321735,1.69014235418207e-05,FALSE
+"remote","qwen3b","image","medium","degraded","throughput_bytes_per_s",30,0.862407527362711,0.00114048989513019,FALSE
+"remote","gemma4b","image","medium","degraded","e_total_j",30,0.967126880835939,0.463844349433296,TRUE
+"remote","gemma4b","image","medium","degraded","duration_s",30,0.890881868388641,0.00506227384972651,FALSE
+"remote","gemma4b","image","medium","degraded","throughput_bytes_per_s",30,0.915374286846857,0.0203807398172141,FALSE
+"remote","qwen7b","image","medium","degraded","e_total_j",30,0.9649842434147,0.412423744662464,TRUE
+"remote","qwen7b","image","medium","degraded","duration_s",30,0.604109294315927,8.19475543510842e-08,FALSE
+"remote","qwen7b","image","medium","degraded","throughput_bytes_per_s",30,0.621454663299148,1.3477194607384e-07,FALSE
+"remote","qwen3b","text","long","degraded","e_total_j",30,0.880394003432785,0.002878549977967,FALSE
+"remote","qwen3b","text","long","degraded","duration_s",30,0.760770335250411,1.36624226282838e-05,FALSE
+"remote","qwen3b","text","long","degraded","throughput_bytes_per_s",30,0.765252953543431,1.62235008297915e-05,FALSE
+"remote","gemma4b","text","long","degraded","e_total_j",30,0.854512036378052,0.000771825713450886,FALSE
+"remote","gemma4b","text","long","degraded","duration_s",30,0.833733590888996,0.000288304146391515,FALSE
+"remote","gemma4b","text","long","degraded","throughput_bytes_per_s",30,0.837290976413157,0.000339817940698092,FALSE
+"remote","qwen7b","text","long","degraded","e_total_j",30,0.926686154453483,0.0401235152295678,FALSE
+"remote","qwen7b","text","long","degraded","duration_s",30,0.779836171182224,2.87357267347875e-05,FALSE
+"remote","qwen7b","text","long","degraded","throughput_bytes_per_s",30,0.782349181719255,3.1775521054051e-05,FALSE
+"remote","qwen3b","image","long","degraded","e_total_j",30,0.89702757850971,0.00710952902258662,FALSE
+"remote","qwen3b","image","long","degraded","duration_s",30,0.728612556812708,4.18539484285723e-06,FALSE
+"remote","qwen3b","image","long","degraded","throughput_bytes_per_s",30,0.855490640310416,0.00080968679485068,FALSE
+"remote","gemma4b","image","long","degraded","e_total_j",30,0.907275820554751,0.0127113414718985,FALSE
+"remote","gemma4b","image","long","degraded","duration_s",30,0.839799960831932,0.000381980573559233,FALSE
+"remote","gemma4b","image","long","degraded","throughput_bytes_per_s",30,0.864655776665736,0.00127682074795813,FALSE
+"remote","qwen7b","image","long","degraded","e_total_j",30,0.86183993968522,0.00110857410755764,FALSE
+"remote","qwen7b","image","long","degraded","duration_s",30,0.501022562342956,5.49359901672224e-09,FALSE
+"remote","qwen7b","image","long","degraded","throughput_bytes_per_s",30,0.52540253424186,1.00487391696633e-08,FALSE
+"remote","qwen3b","text","short","bad","e_total_j",30,0.974857554118164,0.678531507097542,TRUE
+"remote","qwen3b","text","short","bad","duration_s",30,0.832317026251578,0.00027016061704514,FALSE
+"remote","qwen3b","text","short","bad","throughput_bytes_per_s",30,0.87114405773363,0.00177654804250043,FALSE
+"remote","gemma4b","text","short","bad","e_total_j",30,0.96752770721607,0.473933209384008,TRUE
+"remote","gemma4b","text","short","bad","duration_s",30,0.886506156523763,0.0039908412498396,FALSE
+"remote","gemma4b","text","short","bad","throughput_bytes_per_s",30,0.883618494776727,0.00341732687163085,FALSE
+"remote","qwen7b","text","short","bad","e_total_j",30,0.963765870168439,0.385129047976288,TRUE
+"remote","qwen7b","text","short","bad","duration_s",30,0.722867039397525,3.41702125267845e-06,FALSE
+"remote","qwen7b","text","short","bad","throughput_bytes_per_s",30,0.739455750730069,6.17930136564756e-06,FALSE
+"remote","qwen3b","image","short","bad","e_total_j",30,0.91469390133448,0.0195797984687064,FALSE
+"remote","qwen3b","image","short","bad","duration_s",30,0.38761869568485,4.17319818674316e-10,FALSE
+"remote","qwen3b","image","short","bad","throughput_bytes_per_s",30,0.661847881963264,4.54767745543014e-07,FALSE
+"remote","gemma4b","image","short","bad","e_total_j",30,0.974302253449097,0.662181951343459,TRUE
+"remote","gemma4b","image","short","bad","duration_s",30,0.412927957300921,7.20093387491772e-10,FALSE
+"remote","gemma4b","image","short","bad","throughput_bytes_per_s",30,0.640642803564383,2.37649078069994e-07,FALSE
+"remote","qwen7b","image","short","bad","e_total_j",30,0.935936084484956,0.0707286671802392,TRUE
+"remote","qwen7b","image","short","bad","duration_s",30,0.54917011766099,1.84660386678608e-08,FALSE
+"remote","qwen7b","image","short","bad","throughput_bytes_per_s",30,0.585980654216637,4.94305850495764e-08,FALSE
+"remote","qwen3b","text","medium","bad","e_total_j",30,0.960240875568152,0.314193121758902,TRUE
+"remote","qwen3b","text","medium","bad","duration_s",30,0.823555376246679,0.00018176169285782,FALSE
+"remote","qwen3b","text","medium","bad","throughput_bytes_per_s",30,0.84504440363929,0.000489123767250704,FALSE
+"remote","gemma4b","text","medium","bad","e_total_j",30,0.904566065056153,0.0108814954085826,FALSE
+"remote","gemma4b","text","medium","bad","duration_s",30,0.746396749620227,7.96815764784454e-06,FALSE
+"remote","gemma4b","text","medium","bad","throughput_bytes_per_s",30,0.752328260343609,9.93280587257561e-06,FALSE
+"remote","qwen7b","text","medium","bad","e_total_j",30,0.942733054187231,0.107769866931368,TRUE
+"remote","qwen7b","text","medium","bad","duration_s",30,0.886240824054283,0.00393412071575369,FALSE
+"remote","qwen7b","text","medium","bad","throughput_bytes_per_s",30,0.887762185580403,0.00427134281696471,FALSE
+"remote","qwen3b","image","medium","bad","e_total_j",30,0.93974466291027,0.0895299499098419,TRUE
+"remote","qwen3b","image","medium","bad","duration_s",30,0.542474083226414,1.55248354159074e-08,FALSE
+"remote","qwen3b","image","medium","bad","throughput_bytes_per_s",30,0.662129012298113,4.58773088242111e-07,FALSE
+"remote","gemma4b","image","medium","bad","e_total_j",30,0.939175907132233,0.0864284855334779,TRUE
+"remote","gemma4b","image","medium","bad","duration_s",30,0.440461865283819,1.32768359278395e-09,FALSE
+"remote","gemma4b","image","medium","bad","throughput_bytes_per_s",30,0.569708602543508,3.17747198489538e-08,FALSE
+"remote","qwen7b","image","medium","bad","e_total_j",30,0.960433074319762,0.317757176576758,TRUE
+"remote","qwen7b","image","medium","bad","duration_s",30,0.803527218977961,7.60688056254199e-05,FALSE
+"remote","qwen7b","image","medium","bad","throughput_bytes_per_s",30,0.810805649396802,0.000103834612350223,FALSE
+"remote","qwen3b","text","long","bad","e_total_j",30,0.936279908377719,0.0722469756285431,TRUE
+"remote","qwen3b","text","long","bad","duration_s",30,0.889657245825048,0.00473473888589718,FALSE
+"remote","qwen3b","text","long","bad","throughput_bytes_per_s",30,0.894762620029127,0.00626829251416864,FALSE
+"remote","gemma4b","text","long","bad","e_total_j",30,0.957391517293822,0.265292183765166,TRUE
+"remote","gemma4b","text","long","bad","duration_s",30,0.840079644048895,0.000387013734435393,FALSE
+"remote","gemma4b","text","long","bad","throughput_bytes_per_s",30,0.843694351453442,0.000458796094173484,FALSE
+"remote","qwen7b","text","long","bad","e_total_j",30,0.944501637812487,0.12027537253897,TRUE
+"remote","qwen7b","text","long","bad","duration_s",30,0.648948875381024,3.05556586793996e-07,FALSE
+"remote","qwen7b","text","long","bad","throughput_bytes_per_s",30,0.652534466789355,3.4095921449723e-07,FALSE
+"remote","qwen3b","image","long","bad","e_total_j",30,0.980824282433716,0.847027170953645,TRUE
+"remote","qwen3b","image","long","bad","duration_s",30,0.533007631339206,1.21819128323666e-08,FALSE
+"remote","qwen3b","image","long","bad","throughput_bytes_per_s",30,0.653520895818411,3.51441727204879e-07,FALSE
+"remote","gemma4b","image","long","bad","e_total_j",30,0.970844888255398,0.56254473057216,TRUE
+"remote","gemma4b","image","long","bad","duration_s",30,0.631682847721453,1.81935950151311e-07,FALSE
+"remote","gemma4b","image","long","bad","throughput_bytes_per_s",30,0.69753039625255,1.43659101733019e-06,FALSE
+"remote","qwen7b","image","long","bad","e_total_j",30,0.979821525946051,0.820787819546666,TRUE
+"remote","qwen7b","image","long","bad","duration_s",30,0.844363036149395,0.00047355988630945,FALSE
+"remote","qwen7b","image","long","bad","throughput_bytes_per_s",30,0.848950790820299,0.000589495976791063,FALSE
+"local","qwen3b","text","short","none (local)","e_total_j",30,0.892473106320415,0.00552408699358605,FALSE
+"local","qwen3b","text","short","none (local)","duration_s",30,0.477947803939191,3.15713205118614e-09,FALSE
+"local","qwen3b","text","short","none (local)","throughput_bytes_per_s",30,0.508599697319868,6.6137399140993e-09,FALSE
+"local","gemma4b","text","short","none (local)","e_total_j",30,0.958692861363386,0.286724994538808,TRUE
+"local","gemma4b","text","short","none (local)","duration_s",30,0.694509007334027,1.29930828965957e-06,FALSE
+"local","gemma4b","text","short","none (local)","throughput_bytes_per_s",30,0.695018938652893,1.3214669163805e-06,FALSE
+"local","qwen7b","text","short","none (local)","e_total_j",30,0.869818578348256,0.00165972846046974,FALSE
+"local","qwen7b","text","short","none (local)","duration_s",30,0.84491260520698,0.000486071367950706,FALSE
+"local","qwen7b","text","short","none (local)","throughput_bytes_per_s",30,0.84749921448985,0.000549856879122699,FALSE
+"local","qwen3b","image","short","none (local)","e_total_j",30,0.914168229968237,0.018983611382987,FALSE
+"local","qwen3b","image","short","none (local)","duration_s",30,0.528142713245603,1.0767962928444e-08,FALSE
+"local","qwen3b","image","short","none (local)","throughput_bytes_per_s",30,0.523132083899158,9.49120866917282e-09,FALSE
+"local","gemma4b","image","short","none (local)","e_total_j",30,0.944980982127241,0.123907116582367,TRUE
+"local","gemma4b","image","short","none (local)","duration_s",30,0.630580530186985,1.76102864314379e-07,FALSE
+"local","gemma4b","image","short","none (local)","throughput_bytes_per_s",30,0.631594733757983,1.81462256369857e-07,FALSE
+"local","qwen7b","image","short","none (local)","e_total_j",30,0.821960125733452,0.000169283044497824,FALSE
+"local","qwen7b","image","short","none (local)","duration_s",30,0.513616694049149,7.48612884018143e-09,FALSE
+"local","qwen7b","image","short","none (local)","throughput_bytes_per_s",30,0.526419391320158,1.03095393814784e-08,FALSE
+"local","qwen3b","text","medium","none (local)","e_total_j",30,0.927286359483398,0.041613913698122,FALSE
+"local","qwen3b","text","medium","none (local)","duration_s",30,0.768630756610726,1.84879418538575e-05,FALSE
+"local","qwen3b","text","medium","none (local)","throughput_bytes_per_s",30,0.769200764038554,1.89020401474693e-05,FALSE
+"local","gemma4b","text","medium","none (local)","e_total_j",30,0.961307041720433,0.334400034276876,TRUE
+"local","gemma4b","text","medium","none (local)","duration_s",30,0.85465681772922,0.000777306589005497,FALSE
+"local","gemma4b","text","medium","none (local)","throughput_bytes_per_s",30,0.855448036511423,0.000807998099690779,FALSE
+"local","qwen7b","text","medium","none (local)","e_total_j",30,0.741188967162632,6.58194769211853e-06,FALSE
+"local","qwen7b","text","medium","none (local)","duration_s",30,0.670995561273344,6.06327949510926e-07,FALSE
+"local","qwen7b","text","medium","none (local)","throughput_bytes_per_s",30,0.68008811198906,8.10904991892463e-07,FALSE
+"local","qwen3b","image","medium","none (local)","e_total_j",30,0.977759948380279,0.763383193608882,TRUE
+"local","qwen3b","image","medium","none (local)","duration_s",30,0.71960375402456,3.04848753432401e-06,FALSE
+"local","qwen3b","image","medium","none (local)","throughput_bytes_per_s",30,0.728666839375784,4.19347221712801e-06,FALSE
+"local","gemma4b","image","medium","none (local)","e_total_j",30,0.958541637741315,0.284157850428067,TRUE
+"local","gemma4b","image","medium","none (local)","duration_s",30,0.89854739063386,0.00774031199739791,FALSE
+"local","gemma4b","image","medium","none (local)","throughput_bytes_per_s",30,0.898142752388821,0.00756679956791202,FALSE
+"local","qwen7b","image","medium","none (local)","e_total_j",30,0.748695633860323,8.67568022507406e-06,FALSE
+"local","qwen7b","image","medium","none (local)","duration_s",30,0.730112265228912,4.41474491943275e-06,FALSE
+"local","qwen7b","image","medium","none (local)","throughput_bytes_per_s",30,0.75105473101994,9.47140350550836e-06,FALSE
+"local","qwen3b","text","long","none (local)","e_total_j",30,0.954607794435428,0.224233354917963,TRUE
+"local","qwen3b","text","long","none (local)","duration_s",30,0.904143347119782,0.0106220558750547,FALSE
+"local","qwen3b","text","long","none (local)","throughput_bytes_per_s",30,0.903582866963703,0.0102880763284749,FALSE
+"local","gemma4b","text","long","none (local)","e_total_j",30,0.815737428657465,0.000128648608371988,FALSE
+"local","gemma4b","text","long","none (local)","duration_s",30,0.963282223410386,0.374691051355811,TRUE
+"local","gemma4b","text","long","none (local)","throughput_bytes_per_s",30,0.962983379234691,0.368354324474614,TRUE
+"local","qwen7b","text","long","none (local)","e_total_j",30,0.758902078380158,1.27249646718561e-05,FALSE
+"local","qwen7b","text","long","none (local)","duration_s",30,0.742536069470485,6.9140731723707e-06,FALSE
+"local","qwen7b","text","long","none (local)","throughput_bytes_per_s",30,0.752643443016972,1.00506372053658e-05,FALSE
+"local","qwen3b","image","long","none (local)","e_total_j",30,0.981291661126952,0.858765178961463,TRUE
+"local","qwen3b","image","long","none (local)","duration_s",30,0.92291854931371,0.0319501911546471,FALSE
+"local","qwen3b","image","long","none (local)","throughput_bytes_per_s",30,0.923787809656761,0.0336680697927567,FALSE
+"local","gemma4b","image","long","none (local)","e_total_j",30,0.97862931267615,0.788050982782023,TRUE
+"local","gemma4b","image","long","none (local)","duration_s",30,0.948893123545864,0.157891725146862,TRUE
+"local","gemma4b","image","long","none (local)","throughput_bytes_per_s",30,0.948838252293991,0.157357127023885,TRUE
+"local","qwen7b","image","long","none (local)","e_total_j",30,0.757100729231301,1.18854619706499e-05,FALSE
+"local","qwen7b","image","long","none (local)","duration_s",30,0.772788471389485,2.17449279282374e-05,FALSE
+"local","qwen7b","image","long","none (local)","throughput_bytes_per_s",30,0.781392309514974,3.0579668476523e-05,FALSE

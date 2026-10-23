@@ -1,0 +1,1 @@
+{"messages": [{"role": "user", "content": "Describe photosynthesis using the following fields:\n1. Title: A concise title.\n2. Main text: Exactly 1000 words or slightly more explaining photosynthesis.\nCount only the main text toward the word target."}], "max_tokens": 2100, "temperature": 0, "stream": false, "cache_prompt": false, "verbose": true}

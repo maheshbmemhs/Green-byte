@@ -1,0 +1,13 @@
+{
+  "duration_s": 10.7325,
+  "prompt_tokens": 54,
+  "completion_tokens": 174,
+  "output_bytes": 871,
+  "tokens_per_second": 16.2124,
+  "mean_cpu_usage": 5.23,
+  "mean_memory_usage": 10905.61,
+  "mean_energy_usage": 228.8969,
+  "model": "gemma4b",
+  "prompt_type": "text",
+  "max_tokens": 300
+}

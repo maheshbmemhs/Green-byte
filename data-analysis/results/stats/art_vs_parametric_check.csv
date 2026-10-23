@@ -1,0 +1,169 @@
+"model","metric","effect","p_art","p_param","same_conclusion"
+"qwen3b","E_total (standard network)","approach",0.00382329749027954,1.67870988902563e-06,TRUE
+"qwen3b","E_total (standard network)","size",1.40099793273677e-167,0,TRUE
+"qwen3b","E_total (standard network)","modality",4.05971855066031e-106,1.31496091884473e-137,TRUE
+"qwen3b","E_total (standard network)","approach x size",8.24133900550783e-150,1.33764992382833e-147,TRUE
+"qwen3b","E_total (standard network)","approach x modality",1.70786112765401e-107,8.7171714985474e-166,TRUE
+"qwen3b","E_total (standard network)","size x modality",2.19439773397686e-234,1.20347230244416e-280,TRUE
+"qwen3b","E_total (standard network)","approach x size x modality",1.17489085742649e-141,8.93066901525101e-145,TRUE
+"qwen3b","R_E","size",1.29236603475822e-105,1.67077569422969e-122,TRUE
+"qwen3b","R_E","modality",1.65742687718297e-118,1.01383301373997e-120,TRUE
+"qwen3b","R_E","network",1.02815882291965e-10,8.49836581688747e-08,TRUE
+"qwen3b","R_E","size x modality",1.62206673256687e-127,2.7268198105855e-107,TRUE
+"qwen3b","R_E","size x network",0.00176574576005728,0.000269190888057251,TRUE
+"qwen3b","R_E","modality x network",0.0992328580297642,0.0784946863879675,TRUE
+"qwen3b","R_E","size x modality x network",0.162988609400524,0.518316554214999,TRUE
+"gemma4b","E_total (standard network)","approach",1.92014315242532e-95,3.34034429019916e-67,TRUE
+"gemma4b","E_total (standard network)","size",2.81910078727398e-168,0,TRUE
+"gemma4b","E_total (standard network)","modality",0.0544075855807276,0.11673869053197,TRUE
+"gemma4b","E_total (standard network)","approach x size",1.13371368305503e-72,3.37233368546703e-67,TRUE
+"gemma4b","E_total (standard network)","approach x modality",5.68482836967774e-11,4.07615141734167e-09,TRUE
+"gemma4b","E_total (standard network)","size x modality",3.59017618556726e-107,2.77092707936392e-100,TRUE
+"gemma4b","E_total (standard network)","approach x size x modality",9.01540342120457e-11,3.1372212725231e-08,TRUE
+"gemma4b","R_E","size",4.15388693113656e-99,5.94429100917093e-119,TRUE
+"gemma4b","R_E","modality",5.35893161426748e-09,5.62330530115054e-07,TRUE
+"gemma4b","R_E","network",1.81539312284965e-17,1.41813331121617e-12,TRUE
+"gemma4b","R_E","size x modality",3.77448829023507e-31,8.07566667420857e-22,TRUE
+"gemma4b","R_E","size x network",0.00137436864196015,0.000612017991458084,TRUE
+"gemma4b","R_E","modality x network",1.06483537487177e-05,0.00680807365753935,TRUE
+"gemma4b","R_E","size x modality x network",0.137596085397292,0.567592057398876,TRUE
+"qwen7b","E_total (standard network)","approach",8.43413791047054e-110,0,TRUE
+"qwen7b","E_total (standard network)","size",1.48674500122586e-169,0,TRUE
+"qwen7b","E_total (standard network)","modality",8.78053348573308e-62,6.09766131455026e-52,TRUE
+"qwen7b","E_total (standard network)","approach x size",1.05839826323324e-271,0,TRUE
+"qwen7b","E_total (standard network)","approach x modality",7.18960558779534e-107,1.14375358822043e-153,TRUE
+"qwen7b","E_total (standard network)","size x modality",1.93071747803583e-220,0,TRUE
+"qwen7b","E_total (standard network)","approach x size x modality",5.27606265803959e-258,3.52434858311778e-307,TRUE
+"qwen7b","R_E","size",6.85017343747772e-246,0,TRUE
+"qwen7b","R_E","modality",9.84740776940134e-23,4.59188586004084e-10,TRUE
+"qwen7b","R_E","network",0.000112804767774882,0.00527470605295154,TRUE
+"qwen7b","R_E","size x modality",2.45547417649253e-313,0,TRUE
+"qwen7b","R_E","size x network",0.021368255950682,0.0258619236646545,TRUE
+"qwen7b","R_E","modality x network",6.07731949929634e-05,0.028350834866808,TRUE
+"qwen7b","R_E","size x modality x network",0.00348851808666451,0.0906431056057657,FALSE
+"qwen3b","Total energy","size",5.28134000885634e-250,0,TRUE
+"qwen3b","Total energy","modality",2.05702749229355e-159,4.25748513239489e-311,TRUE
+"qwen3b","Total energy","network",1.19225585955252e-09,8.88414040208744e-11,TRUE
+"qwen3b","Total energy","size x modality",4.54205044799131e-281,0,TRUE
+"qwen3b","Total energy","size x network",0.128274458625588,0.155355332330013,TRUE
+"qwen3b","Total energy","modality x network",0.000256747598009313,6.64267328975544e-05,TRUE
+"qwen3b","Total energy","size x modality x network",0.161654444013128,0.226267998503307,TRUE
+"qwen3b","Client (laptop) energy","size",9.38792939984325e-193,7.02304024908946e-166,TRUE
+"qwen3b","Client (laptop) energy","modality",9.85765024886617e-21,1.05433481659284e-14,TRUE
+"qwen3b","Client (laptop) energy","network",2.08911159075583e-13,6.25142511654771e-12,TRUE
+"qwen3b","Client (laptop) energy","size x modality",3.61538101027633e-132,4.21370867115011e-108,TRUE
+"qwen3b","Client (laptop) energy","size x network",0.365061745377271,0.863732268343187,TRUE
+"qwen3b","Client (laptop) energy","modality x network",1.99413869126272e-08,7.24756858867051e-07,TRUE
+"qwen3b","Client (laptop) energy","size x modality x network",0.0640145908053744,0.238745116595592,TRUE
+"qwen3b","Server energy","size",5.66769387570398e-250,0,TRUE
+"qwen3b","Server energy","modality",2.14701501765055e-159,0,TRUE
+"qwen3b","Server energy","network",5.04216149793074e-08,1.53241082248455e-09,TRUE
+"qwen3b","Server energy","size x modality",4.60470526713826e-283,0,TRUE
+"qwen3b","Server energy","size x network",0.0660706177581237,0.0769156123452991,TRUE
+"qwen3b","Server energy","modality x network",0.00362237249131708,0.000594342622703264,TRUE
+"qwen3b","Server energy","size x modality x network",0.177107461505209,0.26984758922265,TRUE
+"gemma4b","Total energy","size",3.84698138197598e-250,0,TRUE
+"gemma4b","Total energy","modality",1.08631210262036e-28,4.58794714583202e-31,TRUE
+"gemma4b","Total energy","network",8.98794228899003e-19,2.77273971214386e-20,TRUE
+"gemma4b","Total energy","size x modality",4.22860213669895e-133,5.90483528690788e-122,TRUE
+"gemma4b","Total energy","size x network",0.24545600792161,0.253938073762456,TRUE
+"gemma4b","Total energy","modality x network",1.92339815918714e-06,1.01061144578862e-05,TRUE
+"gemma4b","Total energy","size x modality x network",0.175399073548013,0.145137086075077,TRUE
+"gemma4b","Client (laptop) energy","size",4.32088908195671e-228,4.91613386054033e-212,TRUE
+"gemma4b","Client (laptop) energy","modality",1.5671001853798e-15,4.18503608549232e-12,TRUE
+"gemma4b","Client (laptop) energy","network",3.90394610951741e-43,1.07253370410623e-26,TRUE
+"gemma4b","Client (laptop) energy","size x modality",1.65251834176917e-14,6.53803384299801e-10,TRUE
+"gemma4b","Client (laptop) energy","size x network",0.00610016888348286,0.0511701362537332,FALSE
+"gemma4b","Client (laptop) energy","modality x network",8.50379500555869e-17,6.89366880705877e-10,TRUE
+"gemma4b","Client (laptop) energy","size x modality x network",0.00289693773867194,0.0229067697609866,TRUE
+"gemma4b","Server energy","size",5.46683559518318e-250,0,TRUE
+"gemma4b","Server energy","modality",1.26020319398802e-32,2.79699593923192e-34,TRUE
+"gemma4b","Server energy","network",2.05816279231865e-13,3.1034921413558e-17,TRUE
+"gemma4b","Server energy","size x modality",6.12285163820251e-158,1.40494528829663e-146,TRUE
+"gemma4b","Server energy","size x network",0.386689236975304,0.410289628556111,TRUE
+"gemma4b","Server energy","modality x network",0.000161065494940957,0.00028262484739993,TRUE
+"gemma4b","Server energy","size x modality x network",0.24970526599371,0.247159148010022,TRUE
+"qwen7b","Total energy","size",1.23221651854632e-250,0,TRUE
+"qwen7b","Total energy","modality",1.53293312553554e-157,7.60776066042882e-232,TRUE
+"qwen7b","Total energy","network",0.0283207866740244,0.0112242300915969,TRUE
+"qwen7b","Total energy","size x modality",0,0,TRUE
+"qwen7b","Total energy","size x network",0.998775826671247,0.941052363483498,TRUE
+"qwen7b","Total energy","modality x network",0.00778027352333932,0.0536094712640799,FALSE
+"qwen7b","Total energy","size x modality x network",0.89236697113203,0.935126190489089,TRUE
+"qwen7b","Client (laptop) energy","size",1.07332419942467e-182,6.943347989032e-213,TRUE
+"qwen7b","Client (laptop) energy","modality",0.103578485691787,0.180067175464783,TRUE
+"qwen7b","Client (laptop) energy","network",0.0105987924974675,0.0455811754521605,TRUE
+"qwen7b","Client (laptop) energy","size x modality",7.166917911533e-71,2.7534963637671e-62,TRUE
+"qwen7b","Client (laptop) energy","size x network",0.767804936820687,0.860111583066486,TRUE
+"qwen7b","Client (laptop) energy","modality x network",0.0288854558232334,0.215909236921254,FALSE
+"qwen7b","Client (laptop) energy","size x modality x network",0.307185990831351,0.706743705717226,TRUE
+"qwen7b","Server energy","size",3.24405825717437e-251,0,TRUE
+"qwen7b","Server energy","modality",4.25820764182304e-160,7.63672278713792e-317,TRUE
+"qwen7b","Server energy","network",7.51406963637068e-05,0.00272015792245299,TRUE
+"qwen7b","Server energy","size x modality",0,0,TRUE
+"qwen7b","Server energy","size x network",0.0828698284792692,0.133268627262278,TRUE
+"qwen7b","Server energy","modality x network",0.0272445961005581,0.209431672898784,FALSE
+"qwen7b","Server energy","size x modality x network",0.333561451678745,0.347989729955195,TRUE
+"qwen3b","Execution time","size",5.07686215125525e-257,0,TRUE
+"qwen3b","Execution time","modality",9.56008417418833e-116,3.51067010648644e-92,TRUE
+"qwen3b","Execution time","network",5.33422079899022e-149,1.65742017359971e-74,TRUE
+"qwen3b","Execution time","size x modality",2.30955037316705e-264,7.9320627440517e-309,TRUE
+"qwen3b","Execution time","size x network",0.137060657752179,0.875135401409773,TRUE
+"qwen3b","Execution time","modality x network",3.17737835770552e-101,2.21163123447459e-42,TRUE
+"qwen3b","Execution time","size x modality x network",0.214772951689807,0.924938256428287,TRUE
+"qwen3b","Throughput","size",1.45311352946747e-212,2.86791356134912e-266,TRUE
+"qwen3b","Throughput","modality",3.34288793035618e-161,1.41005597006557e-287,TRUE
+"qwen3b","Throughput","network",1.56584900406797e-160,4.71538621741848e-139,TRUE
+"qwen3b","Throughput","size x modality",1.79571212365621e-100,8.21967796447484e-89,TRUE
+"qwen3b","Throughput","size x network",5.86214035349841e-40,2.08271951667144e-23,TRUE
+"qwen3b","Throughput","modality x network",1.31024550479591e-46,1.33137418531076e-29,TRUE
+"qwen3b","Throughput","size x modality x network",1.25380101901397e-16,1.17098252454902e-09,TRUE
+"qwen3b","R_T","size",9.22304373898741e-139,3.182028885905e-72,TRUE
+"qwen3b","R_T","modality",0.0882358521203652,0.0153568081462859,FALSE
+"qwen3b","R_T","network",1.09975562343712e-149,1.33270461128437e-61,TRUE
+"qwen3b","R_T","size x modality",7.87579441345154e-237,6.40779608849022e-127,TRUE
+"qwen3b","R_T","size x network",3.76693181058286e-110,2.61037180864881e-33,TRUE
+"qwen3b","R_T","modality x network",8.56411505688595e-106,1.62087586322171e-29,TRUE
+"qwen3b","R_T","size x modality x network",6.19978776570051e-58,2.35542183077066e-13,TRUE
+"gemma4b","Execution time","size",6.21930163957061e-253,0,TRUE
+"gemma4b","Execution time","modality",2.1907753824734e-163,1.71480017557902e-133,TRUE
+"gemma4b","Execution time","network",5.4449348223533e-177,3.46178316103599e-94,TRUE
+"gemma4b","Execution time","size x modality",4.49601688150519e-172,4.28804730088693e-70,TRUE
+"gemma4b","Execution time","size x network",3.81564269282558e-08,0.072837697118431,FALSE
+"gemma4b","Execution time","modality x network",3.17236041743442e-126,1.0529834338196e-57,TRUE
+"gemma4b","Execution time","size x modality x network",0.000303498120486281,0.439232538132382,FALSE
+"gemma4b","Throughput","size",4.60675440698088e-135,1.92939311980453e-300,TRUE
+"gemma4b","Throughput","modality",1.50866593053313e-160,2.79340104882603e-263,TRUE
+"gemma4b","Throughput","network",5.64039321469774e-184,3.66255768489642e-161,TRUE
+"gemma4b","Throughput","size x modality",8.83339592676914e-168,3.64655894002183e-139,TRUE
+"gemma4b","Throughput","size x network",2.33585400939911e-48,1.52461781191038e-30,TRUE
+"gemma4b","Throughput","modality x network",2.94943717939907e-73,6.97679734612923e-49,TRUE
+"gemma4b","Throughput","size x modality x network",1.22065221610349e-06,0.00220609057819975,TRUE
+"gemma4b","R_T","size",1.93901035240381e-150,1.22625201763934e-68,TRUE
+"gemma4b","R_T","modality",1.10461711112559e-163,2.82987340549087e-91,TRUE
+"gemma4b","R_T","network",3.97395652879507e-165,1.98028752261025e-69,TRUE
+"gemma4b","R_T","size x modality",1.67339580552152e-94,2.90381335807196e-28,TRUE
+"gemma4b","R_T","size x network",1.85953683093071e-104,4.50967119155804e-31,TRUE
+"gemma4b","R_T","modality x network",7.51536238051856e-112,6.51224013203102e-34,TRUE
+"gemma4b","R_T","size x modality x network",2.98217657066057e-48,1.72107750472395e-09,TRUE
+"qwen7b","Execution time","size",3.034735458704e-260,0,TRUE
+"qwen7b","Execution time","modality",4.79709958014107e-139,8.72542674256894e-184,TRUE
+"qwen7b","Execution time","network",5.59710597558969e-160,2.95198416558301e-71,TRUE
+"qwen7b","Execution time","size x modality",0,0,TRUE
+"qwen7b","Execution time","size x network",0.112113986789428,0.94426369025084,TRUE
+"qwen7b","Execution time","modality x network",1.68716075849877e-111,5.01232941718957e-41,TRUE
+"qwen7b","Execution time","size x modality x network",0.094648894194705,0.711214825945046,TRUE
+"qwen7b","Throughput","size",5.01851719660799e-197,8.84379235470685e-80,TRUE
+"qwen7b","Throughput","modality",3.87875067195647e-166,6.26118984343023e-222,TRUE
+"qwen7b","Throughput","network",3.58748546415642e-155,2.05809799615184e-68,TRUE
+"qwen7b","Throughput","size x modality",1.86886570418125e-164,9.32631889373523e-81,TRUE
+"qwen7b","Throughput","size x network",1.05854443199011e-101,4.04881946010216e-35,TRUE
+"qwen7b","Throughput","modality x network",9.41086847933108e-92,9.1259778289621e-26,TRUE
+"qwen7b","Throughput","size x modality x network",3.70846274827678e-24,1.9063565682238e-06,TRUE
+"qwen7b","R_T","size",2.84889752506892e-231,0,TRUE
+"qwen7b","R_T","modality",4.47441989409362e-60,4.34727482284554e-21,TRUE
+"qwen7b","R_T","network",1.38730746330405e-78,5.79760625403939e-29,TRUE
+"qwen7b","R_T","size x modality",4.03521288853925e-297,4.94065645841247e-324,TRUE
+"qwen7b","R_T","size x network",1.52685428443007e-66,2.72370063551254e-24,TRUE
+"qwen7b","R_T","modality x network",1.04566281855763e-41,1.20428883992817e-12,TRUE
+"qwen7b","R_T","size x modality x network",9.62526780904986e-30,1.53051219105683e-09,TRUE

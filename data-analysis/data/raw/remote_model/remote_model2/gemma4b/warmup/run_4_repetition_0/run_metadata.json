@@ -1,0 +1,14 @@
+{
+  "model": "gemma4b",
+  "prompt_type": "text",
+  "max_tokens": 1100,
+  "network_condition": "degraded",
+  "phase": "warmup",
+  "target_words": 500,
+  "context_size": 8192,
+  "cache_prompt": false,
+  "profiling_windows": {},
+  "network_direction": "client_egress",
+  "start_ts": 1792107524.0319242,
+  "end_ts": 1792107528.1049936
+}

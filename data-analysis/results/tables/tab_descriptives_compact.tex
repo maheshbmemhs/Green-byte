@@ -1,0 +1,34 @@
+\begin{table*}[tp]
+\centering
+\small
+\caption{Mean (SD) total energy $E_{total}$ in J (left) and mean execution time $T$ in s (right) per treatment, 30 runs each. Remote columns: standard, degraded and bad network; remote energy is laptop + server.}
+\label{tab:descriptives}
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{%
+\begin{tabular}{lll rrrr rrrr}
+\toprule
+\multicolumn{3}{c}{} & \multicolumn{4}{c}{$E_{total}$ (J)} & \multicolumn{4}{c}{$T$ (s)} \\ \cmidrule(lr){4-7} \cmidrule(lr){8-11}
+Model & Input & Size & On-device & Std. & Degr. & Bad & On-device & Std. & Degr. & Bad \\
+\midrule
+Qwen2.5-VL-3B & text & short & 368 (19) & 349 (86) & 394 (75) & 385 (49) & 7.9 & 0.6 & 0.7 & 0.8 \\
+ & text & medium & 1{,}385 (23) & 1{,}256 (112) & 1{,}233 (99) & 1{,}264 (70) & 28.1 & 2.7 & 2.7 & 2.9 \\
+ & text & long & 2{,}783 (20) & 4{,}076 (119) & 4{,}064 (121) & 4{,}119 (105) & 56.3 & 9.0 & 9.1 & 9.3 \\
+ & image & short & 549 (22) & 524 (88) & 584 (81) & 615 (83) & 11.4 & 1.2 & 1.8 & 2.7 \\
+ & image & medium & 2{,}239 (32) & 1{,}364 (123) & 1{,}412 (80) & 1{,}450 (86) & 45.4 & 3.2 & 3.7 & 4.6 \\
+ & image & long & 1{,}994 (31) & 1{,}512 (103) & 1{,}633 (111) & 1{,}666 (94) & 40.5 & 3.6 & 4.3 & 5.1 \\
+\midrule
+Gemma 3 4B & text & short & 497 (8) & 561 (88) & 598 (74) & 594 (50) & 10.7 & 1.0 & 1.2 & 1.3 \\
+ & text & medium & 2{,}122 (25) & 1{,}817 (116) & 1{,}859 (95) & 1{,}875 (67) & 43.1 & 4.0 & 4.1 & 4.2 \\
+ & text & long & 4{,}195 (27) & 3{,}735 (120) & 3{,}801 (90) & 3{,}802 (90) & 85.0 & 8.3 & 8.5 & 8.6 \\
+ & image & short & 798 (14) & 834 (95) & 910 (95) & 955 (79) & 17.3 & 2.0 & 2.6 & 3.5 \\
+ & image & medium & 2{,}099 (21) & 2{,}015 (119) & 2{,}118 (93) & 2{,}166 (72) & 43.2 & 4.7 & 5.3 & 6.2 \\
+ & image & long & 3{,}806 (27) & 3{,}456 (120) & 3{,}480 (118) & 3{,}617 (88) & 77.7 & 7.9 & 8.4 & 9.6 \\
+\midrule
+Qwen2.5-VL-7B & text & short & 517 (8) & 2{,}092 (76) & 2{,}113 (61) & 2{,}058 (48) & 10.3 & 5.4 & 5.5 & 5.6 \\
+ & text & medium & 3{,}603 (50) & 11{,}654 (88) & 11{,}697 (124) & 11{,}635 (93) & 79.0 & 34.7 & 34.8 & 34.9 \\
+ & text & long & 5{,}835 (61) & 20{,}216 (211) & 20{,}241 (179) & 20{,}177 (198) & 128.9 & 60.5 & 60.7 & 60.8 \\
+ & image & short & 855 (13) & 4{,}342 (99) & 4{,}418 (136) & 4{,}394 (91) & 17.6 & 12.5 & 13.1 & 13.9 \\
+ & image & medium & 4{,}963 (75) & 13{,}290 (180) & 13{,}337 (143) & 13{,}333 (149) & 110.3 & 39.8 & 40.3 & 41.2 \\
+ & image & long & 5{,}102 (62) & 14{,}171 (121) & 14{,}193 (166) & 14{,}187 (156) & 113.5 & 42.5 & 43.0 & 43.8 \\
+\bottomrule
+\end{tabular}}
+\end{table*}

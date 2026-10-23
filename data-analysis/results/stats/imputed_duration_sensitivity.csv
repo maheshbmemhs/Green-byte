@@ -1,0 +1,15 @@
+"effect","p_primary_all_runs","p_primary_without_imputed","model","repetitions_dropped","same_conclusion"
+"modality",1.10461711112559e-163,2.12738298348362e-158,"gemma4b","24",TRUE
+"modality x network",7.51536238051856e-112,3.42167163387336e-111,"gemma4b","24",TRUE
+"network",3.97395652879507e-165,1.15123522836056e-161,"gemma4b","24",TRUE
+"size",1.93901035240381e-150,5.41184691252292e-147,"gemma4b","24",TRUE
+"size x modality",1.67339580552152e-94,6.35768333688478e-91,"gemma4b","24",TRUE
+"size x modality x network",2.98217657066057e-48,1.56114061044531e-45,"gemma4b","24",TRUE
+"size x network",1.85953683093071e-104,1.3257690171455e-99,"gemma4b","24",TRUE
+"modality",4.47441989409362e-60,1.51159985417702e-57,"qwen7b","3",TRUE
+"modality x network",1.04566281855763e-41,1.34147802462765e-40,"qwen7b","3",TRUE
+"network",1.38730746330405e-78,4.38837214869521e-76,"qwen7b","3",TRUE
+"size",2.84889752506892e-231,7.28476996214799e-224,"qwen7b","3",TRUE
+"size x modality",4.03521288853946e-297,1.43188188840882e-287,"qwen7b","3",TRUE
+"size x modality x network",9.62526780904986e-30,7.89515689933561e-29,"qwen7b","3",TRUE
+"size x network",1.52685428443007e-66,1.24433701418716e-64,"qwen7b","3",TRUE

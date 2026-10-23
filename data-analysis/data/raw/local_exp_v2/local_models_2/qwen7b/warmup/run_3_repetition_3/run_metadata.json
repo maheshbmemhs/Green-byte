@@ -1,0 +1,9 @@
+{
+  "model": "qwen7b",
+  "phase": "warmup",
+  "prompt_type": "image",
+  "max_tokens": 2100,
+  "target_words": 1000,
+  "context_size": 8192,
+  "cache_prompt": false
+}
