@@ -68,6 +68,11 @@ By default, experiment results are saved in:
 Each session contains experiment settings, model responses, run tables,
 and energy measurements.
 
+## Experiment Data
+
+The data used in this experiment is available on
+[Google Drive](https://drive.google.com/drive/folders/12uHgpc9H1D3IHzmAKojLPEN9vq2-qFrr?usp=sharing).
+
 ## Data Analysis
 
 Install the analysis dependencies listed in the
