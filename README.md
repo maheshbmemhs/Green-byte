@@ -9,20 +9,26 @@ output lengths, and network conditions.
 
 ## Repository Structure
 
-- [Local experiments](examples/greenlab-llm-local/README.md):
+* [Local experiments](examples/greenlab-llm-local/README.md):
   Setup and instructions for on-device inference.
-- [Remote experiments](examples/greenlab-llm-remote/README.md):
+
+* [Remote experiments](examples/greenlab-llm-remote/README.md):
   Server setup, network configuration, and remote inference instructions.
-- [Data analysis](data-analysis/README.md):
+
+* [Data analysis](data-analysis/README.md):
   Data cleaning, statistical analysis, and result generation.
-- `experiment-runner/`: Framework used to execute the experiments.
+
+* `experiment-runner/`: Framework used to execute the experiments.
 
 ## Requirements
 
-- Python 3 and the dependencies in `requirements.txt`
-- llama.cpp with `llama-server` and the required models
-- EnergiBridge for energy measurements
-- SSH access to the server for remote experiments
+* Python 3 and the dependencies in `requirements.txt`
+
+* llama.cpp with `llama-server` and the required models
+
+* EnergiBridge for energy measurements
+
+* SSH access to the server for remote experiments
 
 See the local and remote READMEs for machine setup and permissions.
 
@@ -62,16 +68,12 @@ Add `--smoke` to either command for a shorter experiment.
 
 By default, experiment results are saved in:
 
-- Local: `~/GreenLab/results`
-- Remote: `~/GreenLab/results-remote`
+* Local: `~/GreenLab/results`
+
+* Remote: `~/GreenLab/results-remote`
 
 Each session contains experiment settings, model responses, run tables,
 and energy measurements.
-
-## Experiment Data
-
-The data used in this experiment is available on
-[Google Drive](https://drive.google.com/drive/folders/12uHgpc9H1D3IHzmAKojLPEN9vq2-qFrr?usp=sharing).
 
 ## Data Analysis
 
