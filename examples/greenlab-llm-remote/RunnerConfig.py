@@ -36,9 +36,19 @@ class RunnerConfig(LocalConfig):
     def __init__(self):
         super().__init__()
         self.settings = json.loads((self.results_output_path / 'session.json').read_text())
+        if os.environ.get('GREENLAB_RESUME_ATTEMPT'):
+            self.restore_settings(self.settings)
         self.URL = self.settings['endpoints'][self.model]
         self.interface = self.settings['interface']
         self.context_size = self.settings['contexts'][self.model]
+
+    @classmethod
+    def restore_settings(cls, settings):
+        cls.TOKEN_LIMITS = list(settings['max_tokens'])
+        cls.WORD_TARGETS = {int(k): v for k, v in settings['word_targets'].items()}
+        cls.PROMPTS = dict(settings['prompts'])
+        NETWORKS.clear()
+        NETWORKS.update(settings['network_conditions'])
 
     def server_ready(self):
         try:
@@ -75,7 +85,7 @@ class RunnerConfig(LocalConfig):
         tokens, prompt_type = int(row['max_tokens']), row['prompt_type']
         payload = self.send_request(prompt_type, tokens, directory / 'response.json')
         metadata = {key: row[key] for key in ('model', 'prompt_type', 'max_tokens', 'network_condition')}
-        metadata.update(phase=self.phase, target_words=self.WORD_TARGETS[tokens],
+        metadata.update(resume_attempt=os.environ.get('GREENLAB_RESUME_ATTEMPT'), phase=self.phase, target_words=self.WORD_TARGETS[tokens],
                         context_size=self.context_size, cache_prompt=False,
                         profiling_windows={}, network_direction='client_egress')
         profilers = []
@@ -86,7 +96,8 @@ class RunnerConfig(LocalConfig):
             set_network(self.interface, row['network_condition'])
             time.sleep(1)  # Preserve the existing network settling interval.
             if self.phase == 'main':
-                remote_path = (f"{self.settings['remote_log_dir']}/{self.results_output_path.name}/"
+                remote_session = os.environ.get('GREENLAB_RESUME_ATTEMPT', self.results_output_path.name)
+                remote_path = (f"{self.settings['remote_log_dir']}/{remote_session}/"
                                f"{self.model}/{self.phase}/{directory.name}/remote_energy.csv")
                 metadata['remote_csv'] = remote_path
                 for label, profiler in (
@@ -105,7 +116,7 @@ class RunnerConfig(LocalConfig):
                            check=True, timeout=190)
             elapsed = time.perf_counter() - start
             end_ts = time.time()
-            metadata.update(start_ts=start_ts, end_ts=end_ts)
+            metadata.update(start_ts=start_ts, end_ts=end_ts, duration_s=elapsed)
         except BaseException as exc:
             error = exc
         finally:
@@ -129,40 +140,46 @@ class RunnerConfig(LocalConfig):
         try:
             if error:
                 raise error
-            response = json.loads((directory / 'response.json').read_text())
-            usage = response['usage']
-            prompt_tokens = int(usage['prompt_tokens'])
-            if (response.get('__verbose', {}).get('truncated') or response.get('truncated')
-                    or prompt_tokens + tokens + 1 >= self.context_size):
-                raise ValueError('Context overflow: configure the remote server with a larger context')
-            content = response['choices'][0]['message']['content']
-            generated = int(usage['completion_tokens'])
-            if not isinstance(content, str) or not content or generated <= 0:
-                raise ValueError('Empty inference response')
-            if self.phase == 'warmup':
-                return
-            self.metrics = dict(duration_s=round(elapsed, 4), prompt_tokens=prompt_tokens,
-                                completion_tokens=generated, output_bytes=len(content.encode()),
-                                tokens_per_second=round(generated / elapsed, 4), start_ts=start_ts, end_ts=end_ts)
-            for label in ('local', 'remote'):
-                path = directory / f'{label}_energy.csv'
-                with path.open() as handle:
-                    rows = list(csv.DictReader(handle))
-                if len(rows) < 2:
-                    raise ValueError(f'{label} profiler produced fewer than two samples')
-                # Preserve valid inference and raw data on counter rollover; never fabricate energy.
-                try:
-                    energy_col = next((c for c in ('PACKAGE_ENERGY (J)', 'CPU_ENERGY (J)') if c in rows[0]), None)
-                    if energy_col and any(float(b[energy_col]) < float(a[energy_col]) for a, b in zip(rows, rows[1:])):
-                        raise ValueError('Energy counter decreased: rollover/reset; raw CSV retained')
-                    metrics = self.calculate_resource_metrics(path)
-                    self.metrics.update({label + '_' + k: v for k, v in metrics.items()})
-                    self.metrics[label + '_energy_status'] = 'ok'
-                except ValueError as exc:
-                    for key in ('mean_cpu_usage', 'mean_memory_usage', 'mean_energy_usage'):
-                        self.metrics[label + '_' + key] = ''
-                    self.metrics[label + '_energy_status'] = str(exc)
-            (directory / 'metrics.json').write_text(json.dumps({**metadata, **self.metrics}, indent=2))
+            self.summarize_run(directory, metadata, elapsed)
         except BaseException as exc:
             (self.results_output_path / 'failure.json').write_text(json.dumps({'run': str(directory), 'error': str(exc)}))
             raise
+
+
+    def summarize_run(self, directory, metadata, elapsed):
+        tokens = int(metadata['max_tokens'])
+        start_ts, end_ts = metadata['start_ts'], metadata['end_ts']
+        response = json.loads((directory / 'response.json').read_text())
+        usage = response['usage']
+        prompt_tokens = int(usage['prompt_tokens'])
+        if (response.get('__verbose', {}).get('truncated') or response.get('truncated')
+                or prompt_tokens + tokens + 1 >= self.context_size):
+            raise ValueError('Context overflow: configure the remote server with a larger context')
+        content = response['choices'][0]['message']['content']
+        generated = int(usage['completion_tokens'])
+        if not isinstance(content, str) or not content or generated <= 0:
+            raise ValueError('Empty inference response')
+        if self.phase == 'warmup':
+            return
+        self.metrics = dict(duration_s=round(elapsed, 4), prompt_tokens=prompt_tokens,
+                            completion_tokens=generated, output_bytes=len(content.encode()),
+                            tokens_per_second=round(generated / elapsed, 4), start_ts=start_ts, end_ts=end_ts)
+        for label in ('local', 'remote'):
+            path = directory / f'{label}_energy.csv'
+            with path.open() as handle:
+                rows = list(csv.DictReader(handle))
+            if len(rows) < 2:
+                raise ValueError(f'{label} profiler produced fewer than two samples')
+            # Preserve valid inference and raw data on counter rollover; never fabricate energy.
+            try:
+                energy_col = next((c for c in ('PACKAGE_ENERGY (J)', 'CPU_ENERGY (J)') if c in rows[0]), None)
+                if energy_col and any(float(b[energy_col]) < float(a[energy_col]) for a, b in zip(rows, rows[1:])):
+                    raise ValueError('Energy counter decreased: rollover/reset; raw CSV retained')
+                metrics = self.calculate_resource_metrics(path)
+                self.metrics.update({label + '_' + k: v for k, v in metrics.items()})
+                self.metrics[label + '_energy_status'] = 'ok'
+            except ValueError as exc:
+                for key in ('mean_cpu_usage', 'mean_memory_usage', 'mean_energy_usage'):
+                    self.metrics[label + '_' + key] = ''
+                self.metrics[label + '_energy_status'] = str(exc)
+        (directory / 'metrics.json').write_text(json.dumps({**metadata, **self.metrics}, indent=2))

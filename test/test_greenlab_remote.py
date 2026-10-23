@@ -44,7 +44,9 @@ class RemoteTests(unittest.TestCase):
             self.assertEqual(len({(r['prompt_type'], r['max_tokens'], r['network_condition']) for r in rows}), 18)
 
     def test_remote_word_targets_and_payloads(self):
-        self.assertEqual(support.LocalConfig.TOKEN_LIMITS, [1250, 650, 120])
+        self.assertEqual(support.LocalConfig.TOKEN_LIMITS, Config.TOKEN_LIMITS)
+        self.assertEqual(support.LocalConfig.WORD_TARGETS, Config.WORD_TARGETS)
+        self.assertEqual(support.LocalConfig.PROMPTS, Config.PROMPTS)
         self.assertEqual(Config.TOKEN_LIMITS, [2100, 1100, 300])
         with tempfile.TemporaryDirectory() as tmp:
             for phase in ('warmup', 'main'):
@@ -70,6 +72,57 @@ class RemoteTests(unittest.TestCase):
                             self.assertNotIn('{word_count}', text)
                             self.assertEqual(payload['max_tokens'], tokens)
                             self.assertFalse(payload['cache_prompt'])
+
+    def test_download_retries_and_atomic_publish(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            destination = Path(tmp) / 'energy.csv'
+            destination.write_bytes(b'previous valid data')
+            attempts = []
+            def transfer(command, stdout, check, timeout):
+                self.assertEqual(timeout, 120)
+                self.assertTrue(check)
+                self.assertIn('ConnectTimeout=30', command)
+                self.assertEqual(destination.read_bytes(), b'previous valid data')
+                attempts.append(command)
+                stdout.write(b'partial' if len(attempts) < 3 else b'complete csv')
+                if len(attempts) == 1:
+                    raise subprocess.TimeoutExpired(command, timeout)
+                if len(attempts) == 2:
+                    raise subprocess.CalledProcessError(255, command)
+            with patch.object(support.subprocess, 'run', side_effect=transfer), patch.object(support.time, 'sleep') as sleep:
+                support.fetch_remote_file('host', 'remote.csv', destination)
+            self.assertEqual(len(attempts), 3)
+            self.assertEqual([c.args for c in sleep.call_args_list], [(5,), (5,)])
+            self.assertEqual(destination.read_bytes(), b'complete csv')
+            self.assertEqual(list(Path(tmp).glob('*.part')), [])
+
+    def test_download_exhaustion_preserves_destination(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            destination = Path(tmp) / 'energy.csv'
+            destination.write_bytes(b'valid')
+            with patch.object(support.subprocess, 'run', side_effect=subprocess.TimeoutExpired('ssh', 120)) as run, patch.object(support.time, 'sleep') as sleep:
+                with self.assertRaisesRegex(RuntimeError, 'after 3 attempts'):
+                    support.fetch_remote_file('host', 'remote.csv', destination)
+            self.assertEqual(run.call_count, 3)
+            self.assertEqual(sleep.call_count, 2)
+            self.assertEqual(destination.read_bytes(), b'valid')
+            self.assertEqual(list(Path(tmp).glob('*.part')), [])
+
+    def test_download_interruption_cleans_temporary_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            destination = Path(tmp) / 'energy.csv'
+            with patch.object(support.subprocess, 'run', side_effect=KeyboardInterrupt), patch.object(support.time, 'sleep') as sleep:
+                with self.assertRaises(KeyboardInterrupt):
+                    support.fetch_remote_file('host', 'remote.csv', destination)
+            self.assertFalse(destination.exists())
+            self.assertEqual(list(Path(tmp).iterdir()), [])
+            sleep.assert_not_called()
+
+    def test_profiler_download_uses_shared_transfer(self):
+        with patch.object(support, 'fetch_remote_file') as fetch:
+            profiler = support.Profiler('host', [], 'remote.csv', Path('unused.log'))
+            profiler.fetch(Path('energy.csv'))
+            fetch.assert_called_once_with('host', 'remote.csv', Path('energy.csv'))
 
     def test_network_ownership(self):
         with patch.object(support, 'network_state', return_value=[{'root': True, 'kind': 'netem', 'handle': '123:'}]), \

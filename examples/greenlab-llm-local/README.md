@@ -13,7 +13,7 @@ for every configuration (18 warmup and 36 measured requests total). The second r
 the full experiment (180 warmup and 540 measured requests).
 
 Models run sequentially: Gemma 4B, Qwen 3B, then Qwen 7B. Each model is loaded once,
-warmed up and measured at `max_tokens` 1250, 650, and 120 for both `prompt_type`
+warmed up and measured at `max_tokens` 2100, 1100, and 300 for both `prompt_type`
 values, `text` and `image`, and then unloaded. There are 18 configurations total.
 Full runs use 10 warmup repetitions and 30 measured repetitions per combination:
 60 warmup and 180 measured requests per model. Measured repetitions are shuffled
@@ -58,9 +58,13 @@ photosynthesis shown in the same supplied image for every run. The explicit
 
 | Maximum output tokens | Requested main-text words |
 |---:|---:|
-| 1250 | 1000 |
-| 650 | 500 |
-| 120 | 100 |
+| 2100 | 1000 |
+| 1100 | 500 |
+| 300 | 100 |
+
+These defaults match the remote experiment. The image prompt asks for visible
+details plus scientific explanation, distinguishes image evidence from additional
+knowledge, and aims for the word target with up to 10% extra.
 
 Only the main text counts toward the word target. The output token ceiling covers
 the title and formatting too, so a response may stop before the requested length.
@@ -113,8 +117,8 @@ but no energy CSV or metric files. Analyze only `main/` measurement outputs.
 Both run tables include `model`, `prompt_type`, and `max_tokens`. Each run has
 `run_metadata.json` identifying its phase, configuration, and `target_words`. Measured runs also
 have `metrics.json` with configuration identifiers and the existing metrics, plus
-the raw `energibridge.csv`. Run indices 0–2 represent text at 1250/650/120 tokens;
-indices 3–5 represent image at 1250/650/120. Prefer the factor columns when analyzing.
+the raw `energibridge.csv`. Run indices 0–2 represent text at 2100/1100/300 tokens;
+indices 3–5 represent image at 2100/1100/300. Prefer the factor columns when analyzing.
 
 Measured metrics retain their existing definitions: duration includes the profiler
 wrapper, and `mean_energy_usage` is the CPU package energy delta in joules, not

@@ -7,6 +7,7 @@ import selectors
 import shlex
 import subprocess
 import sys
+import tempfile
 import time
 
 HERE = Path(__file__).resolve().parent
@@ -27,6 +28,35 @@ HANDLE = '7a10:'
 
 def ssh(host, command):
     return ['ssh', *SSH_OPTIONS, host, shlex.join(command)]
+
+
+def fetch_remote_file(host, remote_path, destination):
+    """Retry only downloads; publish a file only after successful SSH completion."""
+    destination = Path(destination)
+    command = ssh(host, ['python3', '-c',
+        'import sys; from pathlib import Path; sys.stdout.buffer.write(Path(sys.argv[1]).expanduser().read_bytes())',
+        str(remote_path)])
+    for attempt in range(1, 4):
+        temporary = None
+        try:
+            with tempfile.NamedTemporaryFile(dir=destination.parent,
+                                             prefix=destination.name + '.', suffix='.part',
+                                             delete=False) as out:
+                temporary = Path(out.name)
+                subprocess.run(command, stdout=out, check=True, timeout=120)
+            temporary.replace(destination)
+            return
+        except (subprocess.TimeoutExpired, subprocess.CalledProcessError) as exc:
+            if attempt == 3:
+                raise RuntimeError(
+                    f'Download failed after 3 attempts: {host}:{remote_path} -> {destination}: {exc}'
+                ) from exc
+            print(f'Download attempt {attempt}/3 failed for {remote_path}: {exc}; retrying in 5 seconds',
+                  file=sys.stderr, flush=True)
+        finally:
+            if temporary is not None:
+                temporary.unlink(missing_ok=True)
+        time.sleep(5)
 
 
 def network_state(interface):
@@ -118,7 +148,4 @@ class Profiler:
 
     def fetch(self, destination):
         if self.host:
-            with destination.open('wb') as out:
-                subprocess.run(ssh(self.host, ['python3', '-c',
-                    'import sys; from pathlib import Path; sys.stdout.buffer.write(Path(sys.argv[1]).expanduser().read_bytes())',
-                    self.path]), stdout=out, check=True, timeout=30)
+            fetch_remote_file(self.host, self.path, destination)

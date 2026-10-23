@@ -86,7 +86,7 @@ Its image prompt is defined in the remote `RunnerConfig.PROMPTS` and asks for a
 description plus scientific explanation, distinguishing visible details from
 additional knowledge. It targets the requested word count with up to 10% extra,
 scaling detail to the target. Word counts are instructions, not guarantees.
-Remote-specific token ceilings allow more room for the requested word counts:
+Local and remote defaults use identical prompts, word targets, and token ceilings:
 
 * Models: `gemma4b`, `qwen3b`, `qwen7b`.
 
@@ -187,3 +187,55 @@ Tests (fake profilers and mocked network/SSH; no remote changes):
 ```bash
 python -m unittest test.test_greenlab_remote test.test_remote_lifecycle -v
 ```
+
+Remote energy CSV and server-log downloads allow 120 seconds per attempt, with
+up to three attempts and 5-second waits between failures. SSH connection setup
+keeps its 30-second timeout. Files are downloaded to temporary files and replace
+the destination only after a successful transfer. Exhausted retries still fail
+the experiment and preserve existing files; inference requests are never retried
+by this mechanism. These changes do not resume or repair earlier failed sessions.
+
+## Resume a failed session
+
+Keep the manual SSH tunnel open, then run:
+
+```bash
+python examples/greenlab-llm-remote/run_experiments.py \
+  --resume /home/mahesh/GreenLab/results-remote/20261016T092308Z-a930744a
+```
+
+No image argument is needed. Resume validates the saved image SHA-256 and full
+configuration matrix, restores the saved prompts, word targets, token ceilings,
+network conditions, model order, GPU settings, profiling commands, and delays.
+Completed rows are skipped; remaining rows retain their saved order. Other
+configuration flags are rejected to prevent mixing new conditions into old data.
+The original session directory remains the results destination.
+
+Before loading models, resume tries to recover pending measurements that have a
+valid response and confirmed successful shutdown of both profilers. Missing or
+invalid remote CSV downloads are fetched from the exact path in the original run
+metadata. Validated artifacts are summarized with the same metric calculations,
+and only then is the row marked DONE. A download failure aborts recovery without
+repeating inference. Older runs lack a saved monotonic duration, so recovered
+metrics use the saved end/start timestamps and record this in
+`metrics.json.duration_source`. Counter rollovers retain the existing blank
+energy values and explanatory status.
+
+Models with no pending rows are not loaded. For remaining models, warmups follow
+the original session's repetition count; a session created with
+`--skip-warmup` still skips them. You can explicitly omit new warmups with
+`--resume /path/to/session --skip-warmup`. The saved stabilization wait is
+retained. A server restart is recorded; resumed measurements therefore span
+separate model lifetimes.
+
+Each restart creates `attempts/resume-<id>/` containing the prior session metadata
+and run tables, recovery records, separate new warmup directories, lifecycle
+records, and server logs. Incomplete run directories are moved under that
+attempt's `failed_runs/` before re-execution; completed run artifacts remain in
+place. New remote profiling files also use the attempt ID, preserving originals.
+Unstarted models receive a new shuffled table once; subsequent resumes retain it.
+
+Resume uses both local locks and the remote account lock. It stops the owned
+model and resets network shaping on errors or interruption. Repeated resumes
+skip every row already marked DONE. This command performs the remaining
+experiment; it is not a dry run.

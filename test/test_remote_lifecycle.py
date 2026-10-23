@@ -24,6 +24,14 @@ from server_lifecycle import RemoteLifecycle
 
 
 class LifecycleTests(unittest.TestCase):
+    def test_server_log_download_uses_shared_transfer(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            manager = RemoteLifecycle(SimpleNamespace(remote_host='host'), Path(tmp))
+            manager.current = {'model': 'qwen7b', 'log': '/remote/server.log'}
+            with patch('server_lifecycle.fetch_remote_file') as fetch:
+                manager.fetch_log('qwen7b')
+                fetch.assert_called_once_with('host', '/remote/server.log', Path(tmp) / 'qwen7b/server.log')
+
     def test_rpc_does_not_confuse_old_reply_with_shutdown(self):
         with tempfile.TemporaryDirectory() as tmp:
             manager = RemoteLifecycle(SimpleNamespace(remote_host='unused'), Path(tmp))

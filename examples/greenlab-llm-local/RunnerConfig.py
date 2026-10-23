@@ -21,8 +21,8 @@ import statistics
 class RunnerConfig:
     operation_type = OperationType.AUTO
     self_measure = False
-    TOKEN_LIMITS = [1250, 650, 120]
-    WORD_TARGETS = {1250: 1000, 650: 500, 120: 100}
+    TOKEN_LIMITS = [2100, 1100, 300]
+    WORD_TARGETS = {2100: 1000, 1100: 500, 300: 100}
     PROMPT_TYPES = ["text", "image"]
 
     LLAMA = Path(
@@ -58,9 +58,13 @@ class RunnerConfig:
             "Count only the main text toward the word target."
         ),
         "image": (
-            "Describe the image using the following fields:\n"
+            "Describe and explain the photosynthesis shown in this image.\n\n"
             "1. Title: A concise title.\n"
-            "2. Main text: Exactly {word_count} words or slightly more describing and explaining the image.\n"
+            "2. Main text: Aim for {word_count} words, up to 10% more.\n\n"
+            "Describe the visible elements, then explain their roles in photosynthesis, "
+            "the inputs and outputs, the stages of the process, and its biological importance. "
+            "Scale the level of detail to the requested word target. "
+            "Clearly distinguish what is visible in the image from additional scientific explanation.\n\n"
             "Count only the main text toward the word target."
         ),
     }

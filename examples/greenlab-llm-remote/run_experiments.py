@@ -89,7 +89,14 @@ def run_phase(session, model, phase, args, settings, manager=None):
                GREENLAB_SERVER_PID=str(os.getpid()), GREENLAB_IMAGE=str(args.image),
                GREENLAB_CTX_SIZE=str(settings['contexts'][model]), GREENLAB_SMOKE='1' if args.smoke else '0')
     print(f'{model}: starting {phase}', flush=True)
-    process = subprocess.Popen([sys.executable, str(ROOT / 'experiment-runner'), str(HERE / 'RunnerConfig.py')],
+    command = [sys.executable, str(ROOT / 'experiment-runner'), str(HERE / 'RunnerConfig.py')]
+    phase_directory = session / model / phase
+    if getattr(args, 'resume_attempt', None):
+        env.update(GREENLAB_RESUME_ATTEMPT=args.resume_attempt.name, GREENLAB_RESUME_DIR=str(args.resume_attempt))
+        command = [sys.executable, str(HERE / 'resume_worker.py')]
+        if phase == 'warmup':
+            phase_directory = args.resume_attempt / model / phase
+    process = subprocess.Popen(command,
                                env=env, cwd=ROOT, start_new_session=True)
     try:
         next_check = 0
@@ -104,8 +111,8 @@ def run_phase(session, model, phase, args, settings, manager=None):
             manager.status()
         if process.returncode:
             raise RuntimeError(f'{model} {phase} failed')
-        repetitions = (1 if args.smoke else 10) if phase == 'warmup' else (2 if args.smoke else 30)
-        verify_completion(session / model / phase, model, repetitions)
+        repetitions = settings[phase + '_repetitions']
+        verify_completion(phase_directory, model, repetitions)
     finally:
         try:
             os.killpg(process.pid, signal.SIGTERM)
@@ -148,7 +155,7 @@ def run_managed_model(manager, session, model, args, settings):
         (session / 'session.json').write_text(json.dumps(settings, indent=2))
         if not args.skip_warmup:
             run_phase(session, model, 'warmup', args, settings, manager)
-        for _ in range(10):
+        for _ in range(settings.get('stabilization_s', 10)):
             manager.status()
             time.sleep(1)
         current = inspect_server(model, ENDPOINTS[model])
@@ -185,7 +192,8 @@ def run_managed_model(manager, session, model, args, settings):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--image', type=Path, required=True)
+    parser.add_argument('--image', type=Path)
+    parser.add_argument('--resume', type=Path, help='Resume an existing session using its saved settings')
     parser.add_argument('--models', nargs='+', choices=list(ENDPOINTS), default=list(ENDPOINTS))
     parser.add_argument('--smoke', action='store_true')
     parser.add_argument('--skip-warmup', action='store_true',
@@ -203,6 +211,12 @@ def main():
                         help='Override GPU layers for all selected models; defaults match local per-model settings')
     parser.add_argument('--startup-timeout', type=int, default=300)
     args = parser.parse_args()
+    if args.resume:
+        from resume_support import resume_session
+        resume_session(sys.modules[__name__], args, parser)
+        return
+    if args.image is None:
+        parser.error('--image is required unless --resume is supplied')
     if args.ctx_size <= max(RunnerConfig.TOKEN_LIMITS) + 1 or (args.gpu_layers is not None and args.gpu_layers < 0) or args.startup_timeout <= 0:
         parser.error('Invalid context size, GPU layer count, or startup timeout')
     if len(set(args.models)) != len(args.models):

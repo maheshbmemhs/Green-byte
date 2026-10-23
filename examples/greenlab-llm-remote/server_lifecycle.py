@@ -6,7 +6,7 @@ import selectors
 import subprocess
 import time
 
-from remote_support import HERE, ssh
+from remote_support import HERE, ssh, fetch_remote_file
 
 
 class RemoteLifecycle:
@@ -101,10 +101,7 @@ class RemoteLifecycle:
             return
         directory = self.session / model
         directory.mkdir(exist_ok=True)
-        with (directory / 'server.log').open('wb') as handle:
-            subprocess.run(ssh(self.args.remote_host, ['python3', '-c',
-                'import sys; from pathlib import Path; sys.stdout.buffer.write(Path(sys.argv[1]).read_bytes())',
-                self.current['log']]), stdout=handle, check=True, timeout=30)
+        fetch_remote_file(self.args.remote_host, self.current['log'], directory / 'server.log')
 
     def close(self):
         try:
