@@ -115,6 +115,46 @@ stats_table <- function(metric, unit, digits, file, label, what) {
 stats_table("e_total_j", "J", 0, "tab_stats_energy.tex", "tab:stats-energy", "the total energy $E_{total}$ (J)")
 stats_table("duration_s", "s", 2, "tab_stats_time.tex", "tab:stats-time", "the execution time $T$ (s)")
 
+# Pooled summary per model and setting (one-column table for the report)
+runs$setting <- factor(ifelse(runs$approach == "local", "On-device", paste("Remote,", runs$network_condition)),
+                       levels = c("On-device", paste("Remote,", NETWORKS)))
+setting_short <- c("On-device" = "On-device", "Remote, standard" = "Remote std.",
+                   "Remote, degraded" = "Remote degr.", "Remote, bad" = "Remote bad")
+sci <- function(x) {
+  e <- floor(log10(x))
+  ifelse(e < 4, formatC(x, format = "f", digits = 1, big.mark = "{,}"), sprintf("$%.1f{\\cdot}10^{%d}$", x / 10^e, e))
+}
+pooled_rows <- function(metric, digits) {
+  f <- function(x) formatC(x, format = "f", digits = digits, big.mark = "{,}")
+  out <- character(0)
+  for (m in MODELS) {
+    g <- runs[runs$model == m, ]
+    for (st in levels(runs$setting)) {
+      v <- g[[metric]][g$setting == st]
+      lab <- if (st == "On-device") MODEL_LABELS[[m]] else ""
+      out <- c(out, paste0(paste(lab, setting_short[[st]], f(mean(v)), f(median(v)), f(sd(v)), sci(var(v)),
+                                 f(min(v)), f(max(v)), sep = " & "), " \\\\"))
+    }
+    if (m != tail(MODELS, 1)) out <- c(out, "\\addlinespace[2pt]")
+  }
+  out
+}
+block <- function(title, rows) c(sprintf("\\multicolumn{8}{l}{\\textit{%s}} \\\\", title), "\\midrule", rows)
+writeLines(c("\\begin{table}[!htb]", "\\centering", "\\small",
+             paste0("\\caption{Summary statistics per model and setting. Each row pools the 180 runs of one ",
+                    "model and setting (2 input modalities $\\times$ 3 content sizes $\\times$ 30 repetitions), ",
+                    "so the spread mainly reflects the different workloads. Remote energy is laptop + server; ",
+                    "Var.\\ = variance (J$^2$, s$^2$).}"),
+             "\\label{tab:summary}",
+             "\\resizebox{\\ifdim\\width>\\linewidth\\linewidth\\else\\width\\fi}{!}{%",
+             "\\begin{tabular}{ll rrrrrr}", "\\toprule",
+             "Model & Setting & Mean & Median & SD & Var. & Min & Max \\\\", "\\midrule",
+             block("Total energy $E_{total}$ (J)", pooled_rows("e_total_j", 0)), "\\midrule",
+             block("Execution time $T$ (s)", pooled_rows("duration_s", 2)),
+             "\\bottomrule", "\\end{tabular}}", "\\end{table}"),
+           file.path(DIR_TABLES, "tab_summary_pooled.tex"))
+message("  table:  ", file.path(DIR_TABLES, "tab_summary_pooled.tex"))
+
 # Anomaly check: zero/negative values and outliers per treatment (1.5 and 3 x IQR)
 k <- c("approach", "model", "input_modality", "content_size", "network_condition")
 flag <- function(v, m) { q <- quantile(v, c(.25, .75)); i <- q[2] - q[1]; as.numeric(v < q[1] - m * i | v > q[2] + m * i) }
