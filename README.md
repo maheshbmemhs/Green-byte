@@ -1,4 +1,4 @@
-# Green-Byte: Comparing On-Device and Remote LLM Inference
+# Comparing On-Device and Remote LLM Inference Across Workload and Network Conditions
 
 This repository contains the replication package for our Green Lab study:
 **Comparing On-Device and Remote LLM Inference Across Workload and Network Conditions**.
